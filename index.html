@@ -1,27 +1,616 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absensi Angkringan Modern</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#8B4513">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Absensi Angkringan Modern</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.json">
+<style>
+/* --- 1. PALET WARNA BARU (Nuansa Angkringan/Kopi) --- */
+:root{
+  --bg:#f0f0f5;
+  --card:#ffffff;
+  --text:#1c1c1e;
+  --muted: rgba(28,28,30,0.6);
+  --accent-primary: #8B4513; /* Cokelat Tanah / Kopi */
+  --accent-secondary: #D2B48C; /* Beige / Krem */
+  --accent-red: #ff4d4d;
+  --accent-green: #4CAF50;
+  --accent-orange: #FFC107;
+  --soft-shadow: 0 4px 12px rgba(16,24,40,0.06);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+body {
+  font-family: var(--font-family);
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+.app {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  padding-bottom: 70px; /* Ruang untuk toast */
+}
+/* --- 2. BANNER BARU (Warna Aksen) --- */
+.banner {
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 14px;
+  padding: 28px 18px;
+  text-align: center;
+  margin-bottom: 18px;
+  box-shadow: var(--soft-shadow);
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.card-action {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 16px 12px;
+  cursor: pointer;
+  text-align:center;
+  box-shadow: var(--soft-shadow);
+  font-weight: 600;
+  transition: transform 0.2s, background-color 0.2s;
+  font-size: 14px; 
+}
+.card-action:active {
+  transform: scale(0.98);
+  background-color: var(--bg); 
+}
+
+/* Penyesuaian Grid */
+.grid-three {
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-bottom: 18px;
+}
+
+.section-title { 
+  font-weight:700; 
+  margin: 8px 4px 12px; 
+  font-size:18px; 
+  cursor: pointer;
+  color: var(--accent-primary);
+}
+/* --- 3. RIWAYAT LEBIH VISUAL --- */
+.riwayat-item {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display:flex;
+  flex-direction: column;
+  box-shadow: var(--soft-shadow);
+  border-left: 5px solid transparent;
+}
+.riwayat-item.absen { border-left-color: var(--accent-green); }
+.riwayat-item.gantikan { border-left-color: var(--accent-orange); }
+/* Status Terlambat */
+.riwayat-item.absen.terlambat { background-color: #fff8e1; border-left-color: var(--accent-red); }
+
+.riwayat-item span {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+}
+#overlay {
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(255,255,255,0.98);
+  padding:20px;
+  overflow-y:auto;
+  z-index:1000;
+}
+.list-item {
+  background:var(--card);
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-weight: 500;
+  border-left: 5px solid var(--accent-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.batal-btn-overlay{
+  background:var(--accent-red);
+  color:white;
+  text-align:center;
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-top: 20px;
+  font-weight: 600;
+}
+.status-hadir { background-color: #e6ffe6; border-left-color: var(--accent-green); }
+.status-belum-hadir { background-color: #fff0f0; border-left-color: var(--accent-red); }
+.status-seharusnya-hadir { background-color: #fff8e1; border-left-color: var(--accent-orange); }
+
+/* Style untuk form di overlay */
+#absensi-form label, #laporan-controls label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text);
+}
+#absensi-form input[type="date"], #absensi-form input[type="time"], #absensi-form select,
+#laporan-controls select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+#absensi-form button, #laporan-controls button {
+    background: var(--accent-primary);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+#absensi-form button:hover, #laporan-controls button:hover {
+    background: #6e3510;
+}
+/* Toast Notification Style */
+#toast {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 2000;
+    left: 50%;
+    bottom: 30px;
+    font-size: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+#toast.show {
+    visibility: visible;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+@-webkit-keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+@keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+@-webkit-keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+@keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+</style>
 </head>
 <body>
-  <h1>Absensi Angkringan Modern</h1>
-  <p>Aplikasi absensi sederhana yang bisa dipakai offline.</p>
-  <button onclick="absen()">Absen</button>
-  <div id="hasil"></div>
+<div class="app">
+  <div class="banner">
+    <h1>ABSENSI ANGKkringan</h1>
+    <p>Jam Kerja: 17:00 - 03:00</p>
+    <div id="status-ringkas" style="font-size:14px; margin-top:10px; font-weight:bold; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px;">
+        Memuat status hari ini...
+    </div>
+  </div>
+  
+  <div class="grid grid-three">
+    <div class="card-action" onclick="mulaiAbsen()">👋 Absen Sekarang</div>
+    <div class="card-action" onclick="mulaiAbsenTanggalLain()">🗓️ Absen Lain</div>
+    <div class="card-action" onclick="mulaiGantikan()">🔁 Gantikan</div>
+  </div>
+  
+  <div class="grid">
+    <div class="card-action" onclick="tampilkanRanking()">🏆 Statistik Total</div>
+    <div class="card-action" onclick="tampilkanLaporanBulanan()">🧾 Laporan Bulanan & Ekspor</div>
+    <div class="card-action" onclick="tampilkanStatus()">📋 Status Jadwal</div>
+    <div class="card-action" onclick="resetData()">⚠️ Reset Data</div>
+  </div>
+  
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="section-title" onclick="mulaiFilterRiwayat()">Riwayat Absensi (<span id="filter-status">Semua Karyawan</span>)</div>
+    <select id="sort-riwayat" onchange="tampilkan()" style="padding: 6px; border-radius: 6px; border: 1px solid #ccc;">
+        <option value="terbaru">Terbaru</option>
+        <option value="terlama">Terlama</option>
+        <option value="nama_asc">Nama (A-Z)</option>
+    </select>
+  </div>
 
-  <script>
-    function absen() {
-      document.getElementById("hasil").innerText = "Absensi berhasil dicatat!";
+  <div id="riwayat"></div>
+</div>
+
+<div id="overlay"></div>
+<div id="toast"></div> <script>
+// --- KONFIGURASI APLIKASI ---
+// Waktu batas awal masuk kerja dan batas keterlambatan
+const WAKTU_TOLERANSI = "17:00"; // Absen setelah ini = Terlambat
+// Rentang waktu jam kerja (Absen Sekarang hanya bisa di jam ini)
+const JAM_KERJA_MULAI = "17:00"; 
+const JAM_KERJA_SELESAI = "03:00"; // Pagi hari berikutnya
+
+let data = JSON.parse(localStorage.getItem("absensi") || "[]");
+let karyawan = ["Lala", "Zaki", "Kemi", "Haris", "Izzul", "Fawaz"]; 
+let mode = null;
+let pengganti = null;
+let filterAktif = "Semua Karyawan";
+
+// JADWAL MINGGUAN (TIDAK BERUBAH)
+const JadwalMingguan = {
+    "Senin": ["Lala", "Zaki", "Kemi"],
+    "Selasa": ["Lala", "Haris", "Izzul"],
+    "Rabu": ["Haris", "Kemi", "Zaki"],
+    "Kamis": ["Fawaz", "Zaki", "Izzul"],
+    "Jumat": ["Lala", "Haris", "Fawaz"],
+    "Sabtu": ["Lala", "Zaki", "Fawaz", "Kemi", "Izzul", "Haris"],
+    "Minggu": ["Fawaz", "Izzul"]
+};
+// ----------------------------
+
+// =================================================================
+// UTILITY FUNCTIONS
+// =================================================================
+
+function todayDate(){ return new Date().toISOString().split('T')[0]; }
+
+function getTodayDayName(){
+    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    return days[new Date().getDay()];
+}
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerHTML = message;
+    toast.className = "show";
+    setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+}
+
+function tutupOverlay(){
+  document.getElementById("overlay").style.display="none";
+  mode = null; 
+  pengganti = null; 
+}
+
+// =================================================================
+// LOGIKA JAM KERJA BARU
+// =================================================================
+
+function checkJamKerja(waktu, tanggal = todayDate()) {
+    const [startHour, startMinute] = JAM_KERJA_MULAI.split(':').map(Number);
+    const [endHour, endMinute] = JAM_KERJA_SELESAI.split(':').map(Number);
+    
+    // Waktu yang di cek
+    const cekTime = new Date(`${tanggal}T${waktu}:00`);
+    
+    // Tentukan batas waktu mulai dan selesai
+    const startTime = new Date(cekTime);
+    startTime.setHours(startHour, startMinute, 0);
+
+    const endTime = new Date(cekTime);
+    endTime.setHours(endHour, endMinute, 0);
+
+    // Jika jam selesai (03:00) lebih kecil dari jam mulai (17:00), artinya jam selesai di hari berikutnya
+    if (endHour < startHour) {
+        if (cekTime.getHours() >= startHour) {
+            // Jika jam saat ini antara 17:00 dan 23:59 (masih hari yang sama)
+            if (cekTime.getTime() >= startTime.getTime()) return true;
+        } else {
+            // Jika jam saat ini antara 00:00 dan 03:00 (sudah hari berikutnya)
+            if (cekTime.getTime() <= endTime.getTime()) return true;
+        }
+    } else {
+        // Logika normal jika jam selesai > jam mulai (tidak terjadi di kasus ini, tapi untuk safety)
+        if (cekTime.getTime() >= startTime.getTime() && cekTime.getTime() <= endTime.getTime()) return true;
+    }
+    
+    return false;
+}
+
+function isTerlambat(waktuAbsen) {
+    // Keterlambatan dihitung dari batas awal jam kerja (17:00)
+    return waktuAbsen > WAKTU_TOLERANSI;
+}
+
+
+// =================================================================
+// UTAMA: TAMPILKAN RIWAYAT & SORTING
+// =================================================================
+
+function tampilkan(){
+  let wrap = document.getElementById("riwayat");
+  wrap.innerHTML = "";
+  document.getElementById('filter-status').innerText = filterAktif;
+
+  // 1. Filter Data
+  let dataYangDitampilkan = data;
+  if (filterAktif !== "Semua Karyawan") {
+    dataYangDitampilkan = data.filter(d => 
+        (d.jenis === "Absen" && d.nama === filterAktif) || 
+        (d.jenis === "Gantikan" && (d.pengganti === filterAktif || d.digantikan === filterAktif))
+    );
+  }
+  
+  // 2. Sorting Data
+  const jenisSort = document.getElementById('sort-riwayat').value;
+  const dataTampil = [...dataYangDitampilkan].sort((a, b) => {
+    const timeA = new Date(`${a.tanggal} ${a.waktu}`).getTime();
+    const timeB = new Date(`${b.tanggal} ${b.waktu}`).getTime();
+
+    if (jenisSort === "terbaru") return timeB - timeA;
+    if (jenisSort === "terlama") return timeA - timeB;
+    if (jenisSort === "nama_asc") {
+        const namaA = a.nama || a.pengganti;
+        const namaB = b.nama || b.pengganti;
+        if (namaA < namaB) return -1;
+        if (namaA > namaB) return 1;
+        return 0;
+    }
+    return timeB - timeA;
+  });
+
+  // 3. Tampilkan di DOM
+  dataTampil.forEach(d => {
+    let div = document.createElement("div");
+    let kelasTambahan = '';
+    if (d.jenis === 'Absen' && d.status === 'Terlambat') {
+        kelasTambahan = ' terlambat';
+    }
+    div.className = `riwayat-item ${d.jenis.toLowerCase()}${kelasTambahan}`; 
+    
+    const indexHapus = data.findIndex(item => 
+        item.jenis === d.jenis && item.waktu === d.waktu && item.tanggal === d.tanggal &&
+        (item.nama === d.nama || (item.pengganti === d.pengganti && item.digantikan === d.digantikan))
+    );
+
+    let content = "";
+    if(d.jenis === "Absen"){
+        const statusText = d.status === 'Terlambat' ? `<span style="color:var(--accent-red); font-weight:bold;"> (Terlambat)</span>` : '';
+        content = `
+            <div><strong>${d.nama} Absen Hadir</strong>${statusText}
+            <span>Pukul ${d.waktu} | Tanggal ${d.tanggal}</span></div>
+        `;
+    } else {
+        content = `
+            <div><strong>${d.pengganti} Gantikan ${d.digantikan}</strong>
+            <span>Ganti Shift Pukul ${d.waktu} | Tanggal ${d.tanggal}</span></div>
+        `;
+    }
+    
+    div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            ${content}
+            <div 
+                onclick="hapusRiwayat(${indexHapus})" 
+                style="color:var(--accent-red); cursor:pointer; font-weight:bold; padding: 5px 0px 5px 10px; font-size:14px;"
+            >
+                ❌
+            </div>
+        </div>
+    `;
+
+    wrap.appendChild(div);
+  });
+  
+  if (dataTampil.length === 0) {
+      wrap.innerHTML = `<p style="text-align:center; color:var(--muted);">Tidak ada riwayat untuk ${filterAktif}.</p>`;
+  }
+  updateStatusRingkas();
+}
+
+function hapusRiwayat(index) {
+    if (confirm("Yakin ingin menghapus riwayat ini?")) {
+        data.splice(index, 1);
+        localStorage.setItem("absensi", JSON.stringify(data));
+        showToast("Riwayat berhasil dihapus.");
+        tampilkan();
+    }
+}
+
+function mulaiFilterRiwayat(){
+  mode = "filter";
+  const opsiFilter = ["Semua Karyawan", ...karyawan];
+  tampilOverlayPilih(opsiFilter, "🔎 Filter Riwayat Berdasarkan:");
+}
+
+function filterRiwayat(nama){
+  filterAktif = nama;
+  tampilkan();
+  tutupOverlay();
+}
+
+// =================================================================
+// PROSES ABSENSI
+// =================================================================
+
+function absen(nama, tanggal, waktu) {
+    const statusTerlambat = isTerlambat(waktu) ? "Terlambat" : "Tepat Waktu";
+    
+    if(data.some(a => a.nama === nama && a.tanggal === tanggal && a.jenis === "Absen")){
+      showToast(nama + ` sudah Absen pada tanggal ${tanggal}.`);
+      return;
     }
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker aktif!"));
+    data.push({
+      nama, 
+      waktu,
+      tanggal, 
+      jenis: "Absen",
+      status: statusTerlambat
+    });
+
+    showToast(`✅ ${nama} berhasil Absen (${statusTerlambat})`);
+    
+    localStorage.setItem("absensi", JSON.stringify(data));
+    tampilkan();
+}
+
+function mulaiAbsen(){
+    const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    
+    if (!checkJamKerja(waktuSekarang)) {
+        showToast(`❌ Absen Hanya Bisa Dilakukan pada jam ${JAM_KERJA_MULAI} sampai ${JAM_KERJA_SELESAI}.`);
+        return;
     }
-  </script>
-</body>
-</html>
+
+    mode="absen";
+    const hariIni = todayDate();
+    const hadirHariIni = data
+        .filter(d => d.tanggal === hariIni && d.jenis === "Absen")
+        .map(d => d.nama);
+        
+    tampilOverlayPilih(karyawan,"👋 Pilih Karyawan yang Absen", hadirHariIni);
+}
+
+function mulaiAbsenTanggalLain() {
+    mode = "absenLain";
+    const ov = document.getElementById("overlay");
+    const hariIni = todayDate();
+    const waktuSekarang = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
+    ov.innerHTML = `
+        <h3>🗓️ Absen Tanggal & Waktu Lain</h3>
+        <form id="absensi-form" onsubmit="event.preventDefault(); prosesAbsenLain()">
+            <label for="karyawan-select">Pilih Karyawan:</label>
+            <select id="karyawan-select" required>
+                <option value="">-- Pilih Nama --</option>
+                ${karyawan.map(n => `<option value="${n}">${n}</option>`).join('')}
+            </select>
+
+            <label for="tgl-absen">Tanggal Absen (Max Hari Ini):</label>
+            <input type="date" id="tgl-absen" max="${hariIni}" value="${hariIni}" required>
+
+            <label for="wkt-absen">Waktu Absen:</label>
+            <input type="time" id="wkt-absen" value="${waktuSekarang}" required>
+
+            <button type="submit">Absen Sekarang</button>
+        </form>
+    `;
+
+    let batal=document.createElement("div");
+    batal.className="batal-btn-overlay";
+    batal.innerText="Batal";
+    batal.onclick=tutupOverlay;
+    ov.appendChild(batal);
+    
+    ov.style.display="block";
+}
+
+function prosesAbsenLain() {
+    const nama = document.getElementById('karyawan-select').value;
+    const tanggal = document.getElementById('tgl-absen').value;
+    const waktu = document.getElementById('wkt-absen').value;
+
+    if (!nama || !tanggal || !waktu) {
+        showToast("Semua field harus diisi.");
+        return;
+    }
+
+    absen(nama, tanggal, waktu);
+    tutupOverlay();
+}
+
+function tampilOverlayPilih(list,judul="Pilih Karyawan", hadirList = []){
+  let ov=document.getElementById("overlay");
+  ov.innerHTML=`<h3>${judul}</h3>`;
+  list.forEach(n=>{
+    const sudahHadir = hadirList.includes(n);
+    let item=document.createElement("div");
+    item.className=`list-item ${sudahHadir ? 'status-hadir' : ''}`;
+    item.innerHTML = `<span>${n}</span><span>${sudahHadir ? 'Sudah Hadir' : 'Pilih'}</span>`;
+    if (!sudahHadir) {
+        item.onclick=()=>pilihNama(n);
+    } else {
+        item.style.cursor = "not-allowed";
+        item.style.opacity = "0.6";
+    }
+    ov.appendChild(item);
+  });
+  let batal=document.createElement("div");
+  batal.className="batal-btn-overlay";
+  batal.innerText="Batal";
+  batal.onclick=tutupOverlay;
+  ov.appendChild(batal);
+  ov.style.display="block";
+}
+
+function pilihNama(nama){
+  if(mode==="absen"){
+    const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    absen(nama, todayDate(), waktuSekarang);
+  } else if(mode==="gantikan1"){
+    pengganti=nama;
+    mode="gantikan2";
+    tampilOverlayPilih(karyawan.filter(x=>x!==nama),"Pilih yang Digantikan");
+  } else if(mode==="gantikan2"){
+    gantikan(pengganti,nama);
+  } else if(mode==="filter"){
+    filterRiwayat(nama);
+  }
+  tutupOverlay();
+}
+
+function mulaiGantikan(){
+  mode = "gantikan1";
+  const hariIni = todayDate();
+  const hadirHariIni = data
+      .filter(d => d.tanggal === hariIni && (d.jenis === 'Absen' || d.jenis === 'Gantikan'))
+      .map(d => d.nama || d.pengganti);
+  
+  const belumHadir = karyawan.filter(k => !hadirHariIni.includes(k));
+  tampilOverlayPilih(belumHadir, "🔁 Siapa yang Menggantikan?");
+}
+
+
+function gantikan(pengganti,digantikan){
+  let hariIni=todayDate();
+  let waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  data.push({pengganti,digantikan, waktu:waktuSekarang, tanggal:hariIni, jenis:"Gantikan"});
+  localStorage.setItem("absensi",JSON.stringify(data));
+  showToast(`${pengganti} berhasil menggantikan ${digantikan}.`);
+  tampilkan();
+  tutupOverlay();
+}
+
+function resetData(){
+  if(confirm("Yakin reset SEMUA data absensi? Tindakan ini tidak bisa dibatalkan.")){
+    data=[];
+    localStorage.removeItem("absensi");
+    filterAktif = "Semua Karyawan";
+    tampilkan();
+    showToast("Data absensi berhasil direset.");
+  }
+}
+
+// =================================================================
+// LAPORAN & EKSPOR CSV (Revisi)
+// =================================================================
+
+function tampilkanLaporanBulanan() {
+    let ov = document.getElementById("overlay");
+    const today = new Date();
+
+    ov.innerHTML = `
+        <h3>🧾 Laporan Absensi Bulanan</h3>
+        <div id="laporan-controls">
+            <label for="bulan-tahun">Pilih Bulan:</label>
+            <select id="bulan-tahun" onchange="prosesLaporanBulanan()">
+                ${Array.from({length: 12}).map((_, i) => {
+                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                    const year = d.getFullYear();
+                    const month = d.getMonth() + 1;
+                    const monthName = d.toLocaleDateString('id-ID', 
