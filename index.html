@@ -1,27 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Absensi Angkringan Modern</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#8B4513">
+<meta name="theme-color" content="#2B6CB0">
 <style>
   :root{
-    --bg: #f0f0f5;
+    --bg: #f3f6fa;
     --card: #ffffff;
-    --text: #1c1c1e;
-    --muted: rgba(28,28,30,0.6);
+    --text: #0f1724;
+    --muted: rgba(15,23,36,0.6);
 
-    --accent-gradient: linear-gradient(135deg,#8B4513 0%, #D2691E 100%);
-    --accent-start: #8B4513;
-    --accent-end: #D2691E;
+    --accent-gradient: linear-gradient(135deg,#2B6CB0 0%, #4C7CBD 100%);
+    --accent-start: #2B6CB0;
+    --accent-end: #4C7CBD;
 
     --accent-red: #ff4d4d;
-    --accent-green: #4CAF50;
-    --accent-orange: #FFC107;
+    --accent-green: #2F855A;
+    --accent-orange: #ED8936;
 
-    --soft-shadow: 0 6px 20px rgba(16,24,40,0.08);
+    --soft-shadow: 0 6px 20px rgba(16,24,40,0.06);
     font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 
@@ -68,11 +68,10 @@
   }
   .card-action:active{
     transform: translateY(2px) scale(.995);
-    box-shadow: 0 0 18px rgba(139,69,19,0.18);
+    box-shadow: 0 0 18px rgba(43,108,176,0.12);
   }
   .card-action.small{ padding:10px; font-weight:600; }
 
-  /* tombol utama lebih besar */
   .big-action{
     grid-column: 1 / -1;
     font-size: 18px;
@@ -81,11 +80,11 @@
     color: white;
     background: var(--accent-gradient);
     border: none;
-    box-shadow: 0 6px 16px rgba(139,69,19,0.4);
+    box-shadow: 0 6px 16px rgba(43,108,176,0.28);
   }
   .big-action:active{
     transform: scale(0.97);
-    box-shadow: 0 0 18px rgba(139,69,19,0.4);
+    box-shadow: 0 0 18px rgba(43,108,176,0.28);
   }
 
   .section-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin:12px 0; }
@@ -136,7 +135,7 @@
   }
 
   table{ width:100%; border-collapse:collapse; margin-top:12px; background:transparent;}
-  table th, table td{ padding:8px 10px; text-align:left; border-bottom:1px solid #f0f0f0; font-size:14px; }
+  table th, table td{ padding:8px 10px; text-align:left; border-bottom:1px solid #eef2f7; font-size:14px; }
 
   #toast{
     visibility:hidden;
@@ -155,10 +154,9 @@
   .muted{ color:var(--muted); font-size:13px; }
   .pill{ background:rgba(0,0,0,0.06); padding:6px 8px; border-radius:8px; font-size:13px; }
 
-  .dark-body{ background:#121214 !important; color:#eaeaea !important; }
-  .dark-card{ background:#1f1f22 !important; color:#eaeaea !important; box-shadow:none !important; }
+  .dark-body{ background:#0b1220 !important; color:#e6eefb !important; }
+  .dark-card{ background:#11151a !important; color:#e6eefb !important; box-shadow:none !important; }
 
-  /* small form elements */
   label{ display:block; margin-top:8px; font-weight:600; }
   input[type="text"], input[type="date"], input[type="time"], select, textarea{
     width:100%; padding:8px; border-radius:8px; border:1px solid #ddd; margin-top:6px; font-size:14px;
@@ -168,13 +166,16 @@
 
   .day-box{ background:var(--card); padding:10px; border-radius:8px; margin-bottom:8px; box-shadow: 0 3px 8px rgba(16,24,40,0.03); }
   .small-muted{ font-size:12px; color:var(--muted); }
+
+  /* small tweaks for tab buttons */
+  #pengaturan-body .card-action.small{ background:transparent; border:1px solid rgba(0,0,0,0.04); }
 </style>
 </head>
 <body>
   <div class="app">
     <div class="banner">
       <div>
-        <h1>ABSENSI ANGKRINGAN</h1>
+        <h1>ABSENSI ANGRINGAN</h1>
         <div class="sub">Absen bebas — bisa kapan saja</div>
       </div>
       <div style="text-align:right">
@@ -192,7 +193,6 @@
       <div class="card-action" onclick="tampilkanLaporanBulanan()">🧾 Laporan Bulanan</div>
       <div class="card-action" onclick="tampilkanStatus()">📋 Status</div>
       <div class="card-action" onclick="tampilkanPengaturan()">⚙️ Pengaturan</div>
-      <!-- reset data moved to laporan -->
     </div>
 
     <div class="section-row">
@@ -220,12 +220,13 @@ const STORAGE_KARYAWAN = 'karyawan';
 const STORAGE_THEME = 'theme';
 const STORAGE_BG = 'backgroundImage';
 const STORAGE_JADWAL = 'jadwalMingguan';
+const STORAGE_SETTINGS = 'appSettings';
 
-// initial data (karyawan default)
+// initial data (load from localStorage)
 let data = JSON.parse(localStorage.getItem(STORAGE_ABSENSI) || '[]');
 let karyawan = JSON.parse(localStorage.getItem(STORAGE_KARYAWAN) || '["Lala","Zaki","Kemi","Haris","Izzul","Fawaz"]');
 
-// Jadwal mingguan: user requested manual setup -> start from saved or empty days
+// Jadwal mingguan: load or initialize
 let jadwalMingguan = JSON.parse(localStorage.getItem(STORAGE_JADWAL) || 'null');
 if(!jadwalMingguan){
   jadwalMingguan = {
@@ -240,10 +241,21 @@ if(!jadwalMingguan){
   localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
 }
 
+// settings
+let settings = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || 'null');
+if(!settings){
+  settings = {
+    batasAbsenAktif: false,
+    batasAbsenJam: '09:00',
+    notifikasiSuara: true
+  };
+  localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+}
+
 let mode = null;
 let pengganti = null;
 let filterAktif = "Semua";
-let savedTheme = localStorage.getItem(STORAGE_THEME) || 'default';
+let savedTheme = localStorage.getItem(STORAGE_THEME) || 'blue';
 let savedBg = localStorage.getItem(STORAGE_BG) || null;
 
 // ===================== Utilities =====================
@@ -251,6 +263,31 @@ function todayDate(){ return new Date().toISOString().slice(0,10); }
 function nowTime(){ return new Date().toLocaleTimeString('id-ID',{hour12:false,hour:'2-digit',minute:'2-digit'}); }
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.className='show'; setTimeout(()=>t.className='',(3000)); }
 function tutupOverlay(){ document.getElementById('overlay').style.display='none'; document.querySelector('#overlay .overlay-inner').innerHTML=''; mode=null; pengganti=null; }
+
+// Play short click sound using Web Audio (no file needed)
+function playClick(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}');
+    if(s && s.notifikasiSuara === false) return;
+  }catch(e){}
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = 1000;
+    g.gain.value = 0.00001;
+    o.connect(g); g.connect(ctx.destination);
+    const now = ctx.currentTime;
+    g.gain.setValueAtTime(0.00001, now);
+    g.gain.exponentialRampToValueAtTime(0.05, now + 0.001);
+    o.start(now);
+    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.06);
+    o.stop(now + 0.07);
+    // close context shortly after
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 120);
+  }catch(err){}
+}
 
 // ===================== Render Riwayat =====================
 function tampilkan(){
@@ -306,8 +343,8 @@ function hapusRiwayat(obj){
   showToast('Entri dihapus');
 }
 
-// ===================== Absen =====================
-function absen(nama, tanggal, waktu){
+// ===================== Absen (core + wrapper untuk batas waktu & suara) =====================
+function coreAbsen(nama, tanggal, waktu){
   // prevent duplicate same person same date
   if(data.some(d => d.jenis === 'Absen' && d.nama === nama && d.tanggal === tanggal)){
     showToast(`${nama} sudah terdaftar hadir pada ${tanggal}`);
@@ -318,6 +355,22 @@ function absen(nama, tanggal, waktu){
   localStorage.setItem(STORAGE_ABSENSI, JSON.stringify(data));
   tampilkan();
   showToast(`${nama} berhasil absen`);
+}
+
+function absen(nama, tanggal, waktu){
+  // check batas waktu
+  const s = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}');
+  if(s && s.batasAbsenAktif && tanggal === todayDate()){
+    const batas = s.batasAbsenJam || '09:00';
+    const wShort = (waktu||'00:00').slice(0,5);
+    if(wShort > batas){
+      showToast(`Absen diblokir — lewat batas waktu (${batas})`);
+      return;
+    }
+  }
+  // play click if allowed
+  try{ if(settings.notifikasiSuara) playClick(); }catch(e){}
+  coreAbsen(nama, tanggal, waktu);
 }
 
 function mulaiAbsen(){
@@ -374,18 +427,17 @@ function pilihNama(nama){
   } else if(mode === 'gantikan1'){
     pengganti = nama;
     mode = 'gantikan2';
-    // show list excluding pengganti
     const others = karyawan.filter(k => k !== pengganti);
     tampilOverlayPilih(others, `🔁 ${pengganti} menggantikan siapa?`);
-    return; // don't tutupOverlay yet, we show next overlay
+    return;
   } else if(mode === 'gantikan2'){
-    // should not happen here, because we handle in pilihNama when mode was gantikan1 --> gantikan called from choose
+    // fallback
     gantikan(pengganti, nama);
   }
   tutupOverlay();
 }
 
-// ===================== Gantikan (rapikan alur) =====================
+// ===================== Gantikan =====================
 function mulaiGantikan(){
   mode = 'gantikan1';
   tampilOverlayPilih(karyawan, '🔁 Siapa yang Menggantikan?');
@@ -400,11 +452,7 @@ function gantikan(penggantiNama, digantikanNama){
   tutupOverlay();
 }
 
-// modify pilihNama to handle gantikan2 selection: override earlier function to call gantikan in this flow
-// We already implement: when mode 'gantikan1' -> store pengganti & show next; when user picks next name, pilihNama executes else branch for mode 'gantikan1' after pengganti set.
-
-
-// ===================== Reset Data MOVED -> will be used in laporan area =====================
+// ===================== Reset Data (used elsewhere) =====================
 function resetAllData(){
   if(!confirm('Yakin menghapus semua data absensi?')) return;
   data = [];
@@ -440,7 +488,6 @@ function tampilkanLaporanBulanan(){
       tutupOverlay();
     }
   };
-  // show
   document.getElementById('overlay').style.display = 'block';
   prosesLaporanBulanan();
 }
@@ -450,7 +497,6 @@ function prosesLaporanBulanan(){
   if(!sel) return;
   const val = sel.value; const [y,m] = val.split('-'); const prefix = `${y}-${m}`;
   const dataBulan = data.filter(d => d.tanggal && d.tanggal.startsWith(prefix));
-  // stats
   const stats = {};
   karyawan.forEach(k => stats[k] = { hadir:0, menggantikan:0, digantikan:0 });
   dataBulan.forEach(d=>{
@@ -511,278 +557,446 @@ function tampilkanRanking(){
     div.innerHTML = `<div><strong>${i<3 ? (i===0?'🥇':i===1?'🥈':'🥉') : '#'+(i+1)} ${k}</strong><div class="muted">Hadir:${s.hadir} • Ganti:${s.menggantikan} • Diganti:${s.digantikan}</div></div>`;
     ovInner.appendChild(div);
   });
-  const b=document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Tutup'; b.onclick=tutupOverlay; ovInner.appendChild(b);
+  const b = document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Tutup'; b.onclick=tutupOverlay;
+  ovInner.appendChild(b);
   document.getElementById('overlay').style.display = 'block';
 }
 
-// ===================== Status: tampilkan jadwal mingguan + hadir hari ini =====================
-function tampilkanStatus(){
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `<h3>📋 Status Hari Ini (${todayDate()})</h3>`;
-  const hariIndex = new Date().getDay(); // 0 Sun .. 6 Sat
-  const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-  const todayName = days[hariIndex];
-  const scheduled = jadwalMingguan[todayName] || [];
-  const hadir = [...new Set(data.filter(d => d.tanggal === todayDate() && d.jenis === 'Absen').map(d=>d.nama))];
-  const pengg = data.filter(d => d.tanggal === todayDate() && d.jenis === 'Gantikan');
-
-  // scheduled
-  const sBox = document.createElement('div'); sBox.className='day-box';
-  sBox.innerHTML = `<strong>Jadwal (${todayName})</strong><div class="muted small-muted">${scheduled.length? scheduled.join(', ') : 'Tidak ada jadwal untuk hari ini'}</div>`;
-  ovInner.appendChild(sBox);
-
-  // hadir
-  const hBox = document.createElement('div'); hBox.className='day-box';
-  hBox.innerHTML = `<strong>Yang hadir hari ini</strong><div class="muted small-muted">${hadir.length? hadir.join(', ') : 'Belum ada yang absen'}</div>`;
-  ovInner.appendChild(hBox);
-
-  // penggantian
-  if(pengg.length){
-    const gBox = document.createElement('div'); gBox.className='day-box';
-    gBox.innerHTML = `<strong>Penggantian hari ini</strong><div class="muted small-muted">${pengg.map(p=>`${p.pengganti}→${p.digantikan}`).join(' • ')}</div>`;
-    ovInner.appendChild(gBox);
-  }
-
-  const b=document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Tutup'; b.onclick=tutupOverlay; ovInner.appendChild(b);
-  document.getElementById('overlay').style.display='block';
-}
-
+// ===================== Status Ringkas & Filter Riwayat =====================
 function updateStatusRingkas(){
-  const ring = document.getElementById('status-ringkas');
-  const hadirToday = new Set(data.filter(d => d.tanggal === todayDate() && (d.jenis === 'Absen' || d.jenis === 'Gantikan')).map(d => d.nama || d.pengganti));
-  ring.textContent = `Status Hari Ini: ${hadirToday.size} hadir`;
+  const hadirHariIni = data.filter(d => d.tanggal === todayDate() && d.jenis === 'Absen').length;
+  document.getElementById('status-ringkas').textContent = `${hadirHariIni} hadir hari ini`;
 }
 
-// ===================== Filter Riwayat =====================
 function mulaiFilterRiwayat(){
   const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `<h3>🔎 Filter Riwayat</h3>`;
-  const opsi = ['Semua', ...karyawan];
-  opsi.forEach(name=>{
-    const el = document.createElement('div'); el.className='list-item';
-    el.innerHTML = `<div>${name}</div><div class="muted">Pilih</div>`;
-    el.onclick = ()=>{ filterRiwayat(name); };
-    ovInner.appendChild(el);
+  ovInner.innerHTML = `<h3>Filter Riwayat</h3><div style="margin-top:8px"></div>`;
+  const body = ovInner.querySelector('div');
+  const allBtn = document.createElement('div'); allBtn.className='list-item'; allBtn.innerText='Semua'; allBtn.onclick = ()=>{ filterAktif='Semua'; tutupOverlay(); tampilkan(); };
+  body.appendChild(allBtn);
+  karyawan.forEach(n=>{
+    const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<strong>${n}</strong><div class="muted">Filter untuk ${n}</div>`;
+    el.onclick = ()=>{ filterAktif = n; tutupOverlay(); tampilkan(); };
+    body.appendChild(el);
   });
-  const b=document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Tutup'; b.onclick=tutupOverlay; ovInner.appendChild(b);
+  const b = document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Batal'; b.onclick=tutupOverlay;
+  ovInner.appendChild(b);
   document.getElementById('overlay').style.display = 'block';
 }
 
-function filterRiwayat(n){
-  filterAktif = (n === 'Semua') ? 'Semua' : n;
-  tampilkan();
-  tutupOverlay();
+// ===================== PENGATURAN LENGKAP (Tab) =====================
+
+// applyTheme & inisialisasi tema (biru–abu default)
+function applyTheme(theme, bg){
+  const body = document.body;
+  // reset any custom accent changes
+  document.documentElement.style.removeProperty('--accent-start');
+  document.documentElement.style.removeProperty('--accent-end');
+
+  body.classList.remove('dark-body');
+  document.querySelectorAll('.card-action, .riwayat-item, .list-item, .day-box').forEach(el=>el.classList.remove('dark-card'));
+
+  if(theme === 'dark'){
+    body.classList.add('dark-body');
+    document.querySelectorAll('.card-action, .riwayat-item, .list-item, .day-box').forEach(el=>el.classList.add('dark-card'));
+    document.getElementById('current-theme').textContent = 'Gelap';
+    // keep accent but darker
+    document.documentElement.style.setProperty('--accent-start', '#1F2937');
+    document.documentElement.style.setProperty('--accent-end', '#334155');
+  } else if(theme === 'blue'){
+    // default blue theme
+    document.documentElement.style.setProperty('--accent-start', '#2B6CB0');
+    document.documentElement.style.setProperty('--accent-end', '#4C7CBD');
+    document.getElementById('current-theme').textContent = 'Biru–Abu';
+  } else if(theme === 'coklat'){
+    document.documentElement.style.setProperty('--accent-start', '#5A2E0A');
+    document.documentElement.style.setProperty('--accent-end', '#B65C1E');
+    document.getElementById('current-theme').textContent = 'Coklat';
+  } else {
+    document.getElementById('current-theme').textContent = 'Default';
+  }
+
+  if(bg){
+    body.style.backgroundImage = `url(${bg})`;
+    body.style.backgroundRepeat = 'no-repeat';
+    body.style.backgroundSize = 'cover';
+  } else {
+    body.style.backgroundImage = 'none';
+  }
+
+  savedTheme = theme;
+  savedBg = bg || null;
+  localStorage.setItem(STORAGE_THEME, savedTheme);
+  localStorage.setItem(STORAGE_BG, savedBg || '');
 }
 
-// ===================== Pengaturan (Tema + Jadwal Mingguan + Manage Karyawan) =====================
-function applyThemeAndBg(){
-  document.getElementById('current-theme').textContent = savedTheme.charAt(0).toUpperCase() + savedTheme.slice(1);
-  if(savedTheme === 'gelap'){
-    document.body.classList.add('dark-body');
-    document.querySelectorAll('.card-action, .riwayat-item, .list-item, .day-box').forEach(el=> el.classList.add('dark-card'));
-  } else {
-    document.body.classList.remove('dark-body');
-    document.querySelectorAll('.card-action, .riwayat-item, .list-item, .day-box').forEach(el=> el.classList.remove('dark-card'));
-  }
-  if(savedBg){
-    document.body.style.backgroundImage = `url('${savedBg}')`;
-  } else {
-    document.body.style.backgroundImage = '';
-  }
-}
+applyTheme(savedTheme || 'blue', savedBg || null);
 
+// Tampilkan Pengaturan (tabbed)
 function tampilkanPengaturan(){
+  mode = null; pengganti = null;
   const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `<h3>⚙️ Pengaturan</h3>
-    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-      <div style="flex:1; min-width:260px;">
-        <h4>Theme & Background</h4>
-        <label>Pilih Tema:</label>
-        <select id="tema-select"><option value="default">Default</option><option value="gelap">Gelap</option><option value="terang">Terang</option></select>
-        <label style="margin-top:8px">Upload Foto Latar (opsional):</label>
-        <input type="file" id="bg-upload" accept="image/*">
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <button class="card-action" id="save-theme-btn">Simpan</button>
-          <button class="card-action" id="reset-theme-btn">Reset</button>
-        </div>
-      </div>
-
-      <div style="flex:1; min-width:300px;">
-        <h4>Kelola Karyawan</h4>
-        <div class="muted small-muted">Tambah karyawan baru (akan muncul di pilihan absen & jadwal)</div>
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <input type="text" id="new-karyawan-name" placeholder="Nama baru">
-          <button class="card-action" id="add-karyawan-btn">Tambah</button>
-        </div>
-        <div id="karyawan-list" style="margin-top:8px;"></div>
-      </div>
+  ovInner.innerHTML = `
+    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap">
+      <button class="card-action small" id="tab-karyawan">👥 Karyawan</button>
+      <button class="card-action small" id="tab-jadwal">🗓️ Jadwal Mingguan</button>
+      <button class="card-action small" id="tab-tampilan">🎨 Tampilan</button>
+      <button class="card-action small" id="tab-batas">⏰ Batas Waktu Absen</button>
+      <button class="card-action small" id="tab-backup">💾 Backup & Restore</button>
+      <button class="card-action small" id="tab-lainnya">⚙️ Lainnya</button>
     </div>
+    <div id="pengaturan-body"></div>
+  `;
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('tab-karyawan').onclick = renderKaryawanSettings;
+  document.getElementById('tab-jadwal').onclick = renderJadwalSettings;
+  document.getElementById('tab-tampilan').onclick = renderTampilanSettings;
+  document.getElementById('tab-batas').onclick = renderBatasWaktuSettings;
+  document.getElementById('tab-backup').onclick = renderBackupSettings;
+  document.getElementById('tab-lainnya').onclick = renderLainnyaSettings;
+  renderKaryawanSettings();
+}
 
-    <hr style="margin:12px 0">
-
-    <h4>Jadwal Mingguan (atur siapa seharusnya absen setiap hari)</h4>
-    <div id="jadwal-editor"></div>
-
-    <div style="margin-top:12px; display:flex; gap:8px;">
-      <button class="card-action" id="save-jadwal-btn">Simpan Jadwal</button>
-      <button class="card-action" id="reset-jadwal-btn" style="background:#ffd6a5; color:#000">Reset Jadwal</button>
+// Karyawan
+function renderKaryawanSettings(){
+  const body = document.getElementById('pengaturan-body');
+  body.innerHTML = `
+    <h3>👥 Kelola Karyawan</h3>
+    <div id="karyawan-list" style="margin-top:8px"></div>
+    <label>Tambah Karyawan:</label>
+    <div style="display:flex; gap:8px; margin-top:6px">
+      <input type="text" id="input-nama-baru" placeholder="Nama baru...">
+      <button class="card-action" id="btn-tambah-nama">➕ Tambah</button>
+    </div>
+    <div style="margin-top:10px; display:flex; gap:8px">
+      <button class="card-action" id="btn-simpan-karyawan">Simpan & Tutup</button>
+      <button class="card-action" id="btn-reset-karyawan" style="background:#ffcccb; color:#000">Reset Karyawan Default</button>
     </div>
   `;
+  refreshKaryawanListUI();
 
-  // set theme select
-  document.getElementById('tema-select').value = savedTheme;
-
-  // populate karyawan list (with delete)
-  function renderKaryawanList(){
-    const container = document.getElementById('karyawan-list');
-    container.innerHTML = '';
-    karyawan.forEach((k, idx)=>{
-      const div = document.createElement('div'); div.className='list-item';
-      div.innerHTML = `<div>${k}</div><div style="display:flex; gap:6px"><button class="card-action small" onclick="editKaryawanName(${idx})">Edit</button><button class="card-action small" style="background:#ffb3b3" onclick="removeKaryawan(${idx})">Hapus</button></div>`;
-      container.appendChild(div);
-    });
-  }
-  window.editKaryawanName = function(index){
-    const newName = prompt('Ubah nama karyawan:', karyawan[index]);
-    if(newName && newName.trim()){
-      const old = karyawan[index];
-      karyawan[index] = newName.trim();
-      // update any jadwal entries and data references? We'll keep historical data names as-is (not replaced) to avoid altering past records
-      localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-      renderKaryawanList();
-      showToast('Nama karyawan diperbarui (catatan: riwayat lama tetap tidak berubah)');
-    }
-  };
-  window.removeKaryawan = function(index){
-    if(!confirm('Hapus karyawan dari daftar? (riwayat lama tidak akan diubah)')) return;
-    const removed = karyawan.splice(index,1)[0];
-    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    renderKaryawanList();
-    showToast(removed+' dihapus dari daftar');
-  };
-  document.getElementById('add-karyawan-btn').onclick = ()=>{
-    const v = document.getElementById('new-karyawan-name').value.trim();
+  document.getElementById('btn-tambah-nama').onclick = ()=>{
+    const v = document.getElementById('input-nama-baru').value.trim();
     if(!v){ showToast('Masukkan nama'); return; }
     if(karyawan.includes(v)){ showToast('Nama sudah ada'); return; }
-    karyawan.push(v); localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    document.getElementById('new-karyawan-name').value='';
-    renderKaryawanList(); renderJadwalEditor(); showToast('Karyawan ditambahkan');
-  };
-  renderKaryawanList();
-
-  // render jadwal editor
-  function renderJadwalEditor(){
-    const ed = document.getElementById('jadwal-editor');
-    ed.innerHTML = '';
-    const daysOrder = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
-    daysOrder.forEach(day=>{
-      const box = document.createElement('div'); box.className='day-box';
-      box.innerHTML = `<strong>${day}</strong><div class="small-muted">Centang karyawan yang dijadwalkan</div>`;
-      const list = document.createElement('div'); list.style.marginTop='8px';
-      karyawan.forEach(k=>{
-        const id = `chk_${day}_${k}`;
-        const chk = document.createElement('div'); chk.style.marginBottom='6px';
-        chk.innerHTML = `<label><input type="checkbox" id="${id}" ${ (jadwalMingguan[day] || []).includes(k) ? 'checked' : '' }> ${k}</label>`;
-        list.appendChild(chk);
-      });
-      // quick add input for day
-      const addRow = document.createElement('div'); addRow.style.marginTop='8px';
-      addRow.innerHTML = `<input type="text" id="add_${day}" placeholder="Tambah nama ke ${day} (jika belum ada di daftar)"><button class="card-action small" id="btnadd_${day}">Tambah</button>`;
-      box.appendChild(list); box.appendChild(addRow);
-      ed.appendChild(box);
-
-      // add button action
-      document.addEventListener('click', function handler(e){
-        if(e.target && e.target.id === `btnadd_${day}`){
-          const val = document.getElementById(`add_${day}`).value.trim();
-          if(!val){ showToast('Masukkan nama'); return; }
-          // add to karyawan if not exists
-          if(!karyawan.includes(val)){ karyawan.push(val); localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan)); showToast('Karyawan baru ditambahkan'); }
-          // add to jadwalMingguan day
-          if(!jadwalMingguan[day].includes(val)) jadwalMingguan[day].push(val);
-          renderJadwalEditor(); renderKaryawanList(); 
-        }
-      });
-    });
-  }
-  // render functions accessible
-  window.renderJadwalEditor = renderJadwalEditor;
-  window.renderKaryawanList = renderKaryawanList;
-  renderJadwalEditor();
-
-  // save theme
-  document.getElementById('save-theme-btn').onclick = ()=>{
-    const sel = document.getElementById('tema-select').value;
-    savedTheme = sel; localStorage.setItem(STORAGE_THEME, savedTheme);
-    const file = document.getElementById('bg-upload').files[0];
-    if(file){
-      const reader = new FileReader();
-      reader.onload = (e)=>{
-        savedBg = e.target.result; localStorage.setItem(STORAGE_BG, savedBg); applyThemeAndBg(); showToast('Tema & background disimpan');
-      };
-      reader.readAsDataURL(file);
-    } else {
-      // remove bg if none selected
-      localStorage.removeItem(STORAGE_BG); savedBg = null; localStorage.setItem(STORAGE_THEME, savedTheme); applyThemeAndBg(); showToast('Tema disimpan');
-    }
-    document.getElementById('current-theme').textContent = savedTheme;
-  };
-
-  document.getElementById('reset-theme-btn').onclick = ()=>{
-    if(confirm('Reset tema & background ke default?')){
-      savedTheme = 'default'; savedBg = null;
-      localStorage.removeItem(STORAGE_THEME); localStorage.removeItem(STORAGE_BG);
-      applyThemeAndBg(); showToast('Tampilan dikembalikan ke default');
-    }
-  };
-
-  // save jadwal
-  document.getElementById('save-jadwal-btn').onclick = ()=>{
-    const daysOrder = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
-    daysOrder.forEach(day=>{
-      const selected = [];
-      karyawan.forEach(k=>{
-        const id = `chk_${day}_${k}`;
-        const el = document.getElementById(id);
-        if(el && el.checked) selected.push(k);
-      });
-      jadwalMingguan[day] = selected;
-    });
-    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
+    karyawan.push(v);
     localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    showToast('Jadwal mingguan disimpan');
-    applyThemeAndBg(); renderJadwalEditor(); renderKaryawanList();
+    document.getElementById('input-nama-baru').value = '';
+    refreshKaryawanListUI();
+    showToast('Karyawan ditambahkan');
   };
 
-  document.getElementById('reset-jadwal-btn').onclick = ()=>{
-    if(confirm('Reset semua jadwal mingguan ke kosong?')){
-      ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"].forEach(d=>jadwalMingguan[d]=[]);
-      localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
-      renderJadwalEditor(); showToast('Jadwal dikosongkan');
-    }
+  document.getElementById('btn-simpan-karyawan').onclick = ()=>{
+    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
+    showToast('Perubahan karyawan disimpan');
+    tutupOverlay();
+    tampilkan();
+  };
+
+  document.getElementById('btn-reset-karyawan').onclick = ()=>{
+    if(!confirm('Reset daftar karyawan ke default?')) return;
+    karyawan = ["Lala","Zaki","Kemi","Haris","Izzul","Fawaz"];
+    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
+    refreshKaryawanListUI();
+    showToast('Daftar karyawan direset');
   };
 }
 
-// ===================== Init =====================
-applyThemeAndBg();
-tampilkan();
+function refreshKaryawanListUI(){
+  const listWrap = document.getElementById('karyawan-list');
+  listWrap.innerHTML = '';
+  karyawan.forEach((n, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.justifyContent = 'space-between';
+    row.innerHTML = `
+      <div style="display:flex; gap:8px; align-items:center; flex:1">
+        <input type="text" data-idx="${idx}" value="${n}" style="flex:1; padding:6px; border-radius:8px; border:1px solid #ddd">
+      </div>
+      <div style="display:flex; gap:6px; margin-left:8px">
+        <button class="card-action small" data-action="save" data-idx="${idx}">Simpan</button>
+        <button class="card-action small" data-action="hapus" data-idx="${idx}" style="background:#ffdddd">Hapus</button>
+      </div>
+    `;
+    listWrap.appendChild(row);
+    row.querySelector('[data-action="save"]').onclick = (e)=>{
+      const i = Number(e.target.dataset.idx);
+      const newName = row.querySelector(`input[data-idx="${i}"]`).value.trim();
+      if(!newName){ showToast('Nama tidak boleh kosong'); return; }
+      if(karyawan.includes(newName) && karyawan[i] !== newName){ showToast('Nama duplikat'); return; }
+      karyawan[i] = newName;
+      localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
+      refreshKaryawanListUI();
+      showToast('Nama disimpan');
+    };
+    row.querySelector('[data-action="hapus"]').onclick = (e)=>{
+      const i = Number(e.target.dataset.idx);
+      if(!confirm(`Hapus ${karyawan[i]}?`)) return;
+      karyawan.splice(i,1);
+      localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
+      refreshKaryawanListUI();
+      showToast('Karyawan dihapus');
+    };
+  });
+}
+
+// Jadwal Mingguan
+function renderJadwalSettings(){
+  const body = document.getElementById('pengaturan-body');
+  body.innerHTML = `<h3>🗓️ Jadwal Mingguan</h3><div id="jadwal-days" style="margin-top:8px"></div>
+    <div style="display:flex; gap:8px; margin-top:10px">
+      <button class="card-action" id="btn-simpan-jadwal">Simpan Jadwal</button>
+      <button class="card-action" id="btn-bersihkan-jadwal" style="background:#ffcccb; color:#000">Bersihkan Semua</button>
+    </div>
+  `;
+  const wrap = document.getElementById('jadwal-days');
+  wrap.innerHTML = '';
+  const days = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
+  days.forEach(day=>{
+    const box = document.createElement('div');
+    box.className = 'day-box';
+    box.innerHTML = `<strong>${day}</strong><div style="margin-top:8px" id="ch-${day}"></div>`;
+    wrap.appendChild(box);
+    const chWrap = box.querySelector(`#ch-${day}`);
+    karyawan.forEach(k=>{
+      const id = `chk-${day}-${k}`;
+      const checked = (jadwalMingguan[day] || []).includes(k);
+      const el = document.createElement('label');
+      el.style.display='inline-flex';
+      el.style.alignItems='center';
+      el.style.gap='6px';
+      el.style.padding='4px 6px';
+      el.style.marginRight='6px';
+      el.style.borderRadius='8px';
+      el.style.background='rgba(0,0,0,0.03)';
+      el.innerHTML = `<input type="checkbox" id="${id}" data-day="${day}" data-name="${k}" ${checked ? 'checked' : ''}> ${k}`;
+      chWrap.appendChild(el);
+    });
+  });
+
+  document.getElementById('btn-simpan-jadwal').onclick = ()=>{
+    const newJ = {};
+    days.forEach(d=>newJ[d]=[]);
+    document.querySelectorAll('input[type="checkbox"]').forEach(chk=>{
+      const day = chk.dataset.day;
+      const name = chk.dataset.name;
+      if(day && name){
+        if(!newJ[day]) newJ[day] = [];
+        if(chk.checked) newJ[day].push(name);
+      }
+    });
+    jadwalMingguan = newJ;
+    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
+    showToast('Jadwal disimpan');
+    tutupOverlay();
+  };
+
+  document.getElementById('btn-bersihkan-jadwal').onclick = ()=>{
+    if(!confirm('Kosongkan seluruh jadwal mingguan?')) return;
+    days.forEach(d=>jadwalMingguan[d]=[]);
+    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
+    renderJadwalSettings();
+    showToast('Jadwal dikosongkan');
+  };
+}
+
+// Tampilan (tema & background)
+function renderTampilanSettings(){
+  const body = document.getElementById('pengaturan-body');
+  body.innerHTML = `
+    <h3>🎨 Tampilan & Tema</h3>
+    <label>Pilih Tema:</label>
+    <select id="select-theme">
+      <option value="blue">Biru–Abu (Default)</option>
+      <option value="dark">Gelap</option>
+      <option value="coklat">Coklat</option>
+    </select>
+
+    <label>Background (URL, kosongkan untuk default):</label>
+    <input type="text" id="input-bg-url" placeholder="https://...">
+
+    <div style="display:flex; gap:8px; margin-top:12px">
+      <button class="card-action" id="btn-apply-theme">Terapkan</button>
+      <button class="card-action" id="btn-reset-theme" style="background:#ffcccb; color:#000">Reset Tema</button>
+    </div>
+  `;
+  document.getElementById('select-theme').value = savedTheme || 'blue';
+  document.getElementById('input-bg-url').value = savedBg || '';
+
+  document.getElementById('btn-apply-theme').onclick = ()=>{
+    const t = document.getElementById('select-theme').value;
+    const bg = document.getElementById('input-bg-url').value.trim();
+    applyTheme(t, bg || null);
+    showToast('Tema diterapkan');
+  };
+  document.getElementById('btn-reset-theme').onclick = ()=>{
+    if(!confirm('Reset tema ke default?')) return;
+    applyTheme('blue', null);
+    localStorage.removeItem(STORAGE_BG);
+    showToast('Tema direset');
+  };
+}
+
+// Batas Waktu Absen
+function renderBatasWaktuSettings(){
+  const s = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}');
+  const body = document.getElementById('pengaturan-body');
+  body.innerHTML = `
+    <h3>⏰ Batas Waktu Absen</h3>
+    <label><input type="checkbox" id="chk-batas" ${s.batasAbsenAktif ? 'checked' : ''}> Aktifkan batas waktu absen</label>
+    <label>Jam batas (HH:MM):</label>
+    <input type="time" id="input-batas-jam" value="${s.batasAbsenJam || '09:00'}">
+    <label style="margin-top:8px"><input type="checkbox" id="chk-suara" ${s.notifikasiSuara ? 'checked' : ''}> Suara notifikasi saat absen berhasil</label>
+    <div style="display:flex; gap:8px; margin-top:12px">
+      <button class="card-action" id="btn-save-batas">Simpan</button>
+    </div>
+  `;
+  document.getElementById('btn-save-batas').onclick = ()=>{
+    const aktif = document.getElementById('chk-batas').checked;
+    const jam = document.getElementById('input-batas-jam').value || '09:00';
+    const suara = document.getElementById('chk-suara').checked;
+    settings.batasAbsenAktif = aktif;
+    settings.batasAbsenJam = jam;
+    settings.notifikasiSuara = suara;
+    localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+    // update global settings var
+    try{ settings = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}'); }catch(e){}
+    showToast('Pengaturan batas waktu disimpan');
+    tutupOverlay();
+  };
+}
+
+// Backup & Restore
+function renderBackupSettings(){
+  const body = document.getElementById('pengaturan-body');
+  body.innerHTML = `
+    <h3>💾 Backup & Restore</h3>
+    <p class="muted">Ekspor / impor semua data aplikasi (absensi, karyawan, jadwal, theme, settings).</p>
+    <div style="display:flex; gap:8px; margin-top:12px">
+      <button class="card-action" id="btn-export-json">⬇️ Ekspor Semua (JSON)</button>
+      <label style="display:inline-flex; align-items:center; gap:8px">
+        <input type="file" id="file-import" accept="application/json" style="display:none">
+        <button class="card-action" id="btn-trigger-import">⬆️ Impor JSON</button>
+      </label>
+    </div>
+  `;
+  document.getElementById('btn-export-json').onclick = backupExport;
+  document.getElementById('btn-trigger-import').onclick = ()=>{
+    document.getElementById('file-import').click();
+  };
+  document.getElementById('file-import').onchange = backupImport;
+}
+
+function backupExport(){
+  const payload = {
+    absensi: data,
+    karyawan: karyawan,
+    jadwalMingguan: jadwalMingguan,
+    theme: savedTheme,
+    backgroundImage: savedBg,
+    settings: settings
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `backup_absensi_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('Backup JSON diunduh');
+}
+
+function backupImport(e){
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  if(!confirm('Impor akan menimpa data saat ini. Lanjutkan?')) { e.target.value = ''; return; }
+  const fr = new FileReader();
+  fr.onload = evt=>{
+    try{
+      const obj = JSON.parse(evt.target.result);
+      if(obj.karyawan) { karyawan = obj.karyawan; localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan)); }
+      if(obj.absensi) { data = obj.absensi; localStorage.setItem(STORAGE_ABSENSI, JSON.stringify(data)); }
+      if(obj.jadwalMingguan) { jadwalMingguan = obj.jadwalMingguan; localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan)); }
+      if(obj.theme) { savedTheme = obj.theme; localStorage.setItem(STORAGE_THEME, savedTheme); }
+      if(obj.backgroundImage) { savedBg = obj.backgroundImage; localStorage.setItem(STORAGE_BG, savedBg || ''); }
+      if(obj.settings) { settings = obj.settings; localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings)); }
+      applyTheme(savedTheme || 'blue', savedBg || null);
+      tampilkan();
+      showToast('Impor berhasil');
+      tutupOverlay();
+    }catch(err){
+      console.error(err);
+      showToast('File JSON tidak valid');
+    } finally { e.target.value = ''; }
+  };
+  fr.readAsText(f);
+}
+
+// Lainnya (reset & tentang)
+function renderLainnyaSettings(){
+  const body = document.getElementById('pengaturan-body');
+  body.innerHTML = `
+    <h3>⚙️ Lainnya</h3>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="card-action" id="btn-reset-absensi" style="background:#ffb3b3">⚠️ Hapus Semua Data Absensi</button>
+      <button class="card-action" id="btn-reset-semua" style="background:#ff8c8c">⚠️ Reset Semua (Absensi, Karyawan, Jadwal)</button>
+    </div>
+    <div style="margin-top:12px; padding:12px; background:var(--card); border-radius:8px">
+      <strong>Versi:</strong> 1.0.0<br>
+      <strong>Aplikasi:</strong> Absensi Angkringan Modern<br>
+      <small class="muted">Dibuat otomatis — gunakan fitur Backup sebelum reset.</small>
+    </div>
+  `;
+  document.getElementById('btn-reset-absensi').onclick = ()=>{
+    if(!confirm('Hapus semua data absensi? (aksi ini tidak menghapus daftar karyawan)')) return;
+    data = [];
+    localStorage.removeItem(STORAGE_ABSENSI);
+    tampilkan();
+    showToast('Semua data absensi dihapus');
+    tutupOverlay();
+  };
+  document.getElementById('btn-reset-semua').onclick = ()=>{
+    if(!confirm('Reset semua data (absensi, karyawan, jadwal)?')) return;
+    data = [];
+    karyawan = ["Lala","Zaki","Kemi","Haris","Izzul","Fawaz"];
+    jadwalMingguan = {"Senin":[],"Selasa":[],"Rabu":[],"Kamis":[],"Jumat":[],"Sabtu":[],"Minggu":[]};
+    localStorage.removeItem(STORAGE_ABSENSI);
+    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
+    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
+    showToast('Semua data direset');
+    tampilkan();
+    tutupOverlay();
+  };
+}
+
+// Safety: tutup overlay on Escape
+document.addEventListener('keydown', (ev)=>{
+  if(ev.key === 'Escape'){
+    if(document.getElementById('overlay').style.display === 'block') tutupOverlay();
+  }
+});
+
+// storage event sync
+window.addEventListener('storage', (e)=>{
+  if(e.key === STORAGE_KARYAWAN){
+    try{ karyawan = JSON.parse(e.newValue || '[]'); }catch(){}
+  }
+});
+
+// On load
 updateStatusRingkas();
+tampilkan();
 
-// PWA: try register service worker if exists
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js').then(()=>console.log('SW registered')).catch(()=>{/* ignore */});
-}
-
-// Expose some functions globally for inline handlers (if necessary)
-window.tampilkan = tampilkan;
-window.tampilkanLaporanBulanan = tampilkanLaporanBulanan;
-window.tampilkanRanking = tampilkanRanking;
-window.tampilkanStatus = tampilkanStatus;
-window.tampilkanPengaturan = tampilkanPengaturan;
+// expose some functions to window for inline onclicks
 window.mulaiAbsen = mulaiAbsen;
 window.mulaiAbsenTanggalLain = mulaiAbsenTanggalLain;
 window.mulaiGantikan = mulaiGantikan;
-window.mulaiFilterRiwayat = mulaiFilterRiwayat;
+window.tampilkanRanking = tampilkanRanking;
+window.tampilkanLaporanBulanan = tampilkanLaporanBulanan;
+window.tampilkanStatus = function(){ alert('Fungsi Status belum diisi'); };
+window.tampilkanPengaturan = tampilkanPengaturan;
+window.tampilkan = tampilkan;
+window.hapusRiwayat = hapusRiwayat;
+
 </script>
 </body>
 </html>
