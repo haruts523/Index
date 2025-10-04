@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi Angkringan Modern</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B4513">
+</head>
+<body>
+  <h1>Absensi Angkringan Modern</h1>
+  <p>Aplikasi absensi sederhana yang bisa dipakai offline.</p>
+  <button onclick="absen()">Absen</button>
+  <div id="hasil"></div>
+
+  <script>
+    function absen() {
+      document.getElementById("hasil").innerText = "Absensi berhasil dicatat!";
+    }
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker aktif!"));
+    }
+  </script>
+</body>
+</html>
