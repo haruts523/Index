@@ -4,21 +4,20 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Absensi Angkringan Modern</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<link rel="manifest" href="manifest.json">
 <style>
-/* --- 1. PALET WARNA BARU (Nuansa Angkringan/Kopi) --- */
 :root{
   --bg:#f0f0f5;
   --card:#ffffff;
   --text:#1c1c1e;
   --muted: rgba(28,28,30,0.6);
-  --accent-primary: #8B4513; /* Cokelat Tanah / Kopi */
-  --accent-secondary: #D2B48C; /* Beige / Krem */
+
+  /* Warna utama jadi gradasi coklat */
+  --accent-primary: linear-gradient(135deg, #8B4513, #D2691E);
+  --accent-secondary: #D2B48C; 
   --accent-red: #ff4d4d;
   --accent-green: #4CAF50;
   --accent-orange: #FFC107;
+
   --soft-shadow: 0 4px 12px rgba(16,24,40,0.06);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
@@ -31,16 +30,17 @@ body {
   display: flex;
   justify-content: center;
   min-height: 100vh;
+  background-size: cover;
+  background-attachment: fixed;
 }
 .app {
   width: 100%;
   max-width: 420px;
   padding: 20px;
-  padding-bottom: 70px; /* Ruang untuk toast */
+  padding-bottom: 70px;
 }
-/* --- 2. BANNER BARU (Warna Aksen) --- */
 .banner {
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, #8B4513, #D2691E);
   color: white;
   border-radius: 14px;
   padding: 28px 18px;
@@ -60,30 +60,26 @@ body {
   padding: 16px 12px;
   cursor: pointer;
   text-align:center;
-  box-shadow: var(--soft-shadow);
   font-weight: 600;
-  transition: transform 0.2s, background-color 0.2s;
   font-size: 14px; 
+  box-shadow: var(--soft-shadow);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 .card-action:active {
-  transform: scale(0.98);
-  background-color: var(--bg); 
+  transform: scale(0.95);
+  box-shadow: 0 0 15px rgba(139,69,19,0.6);
 }
-
-/* Penyesuaian Grid */
 .grid-three {
     grid-template-columns: 1fr 1fr 1fr;
     margin-bottom: 18px;
 }
-
 .section-title { 
   font-weight:700; 
   margin: 8px 4px 12px; 
   font-size:18px; 
   cursor: pointer;
-  color: var(--accent-primary);
+  color: #8B4513;
 }
-/* --- 3. RIWAYAT LEBIH VISUAL --- */
 .riwayat-item {
   background: var(--card);
   border-radius: 12px;
@@ -96,14 +92,7 @@ body {
 }
 .riwayat-item.absen { border-left-color: var(--accent-green); }
 .riwayat-item.gantikan { border-left-color: var(--accent-orange); }
-/* Status Terlambat */
-.riwayat-item.absen.terlambat { background-color: #fff8e1; border-left-color: var(--accent-red); }
 
-.riwayat-item span {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 3px;
-}
 #overlay {
   display:none;
   position:fixed;
@@ -121,7 +110,7 @@ body {
   cursor:pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   font-weight: 500;
-  border-left: 5px solid var(--accent-primary);
+  border-left: 5px solid #8B4513;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -136,43 +125,6 @@ body {
   margin-top: 20px;
   font-weight: 600;
 }
-.status-hadir { background-color: #e6ffe6; border-left-color: var(--accent-green); }
-.status-belum-hadir { background-color: #fff0f0; border-left-color: var(--accent-red); }
-.status-seharusnya-hadir { background-color: #fff8e1; border-left-color: var(--accent-orange); }
-
-/* Style untuk form di overlay */
-#absensi-form label, #laporan-controls label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--text);
-}
-#absensi-form input[type="date"], #absensi-form input[type="time"], #absensi-form select,
-#laporan-controls select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 16px;
-}
-#absensi-form button, #laporan-controls button {
-    background: var(--accent-primary);
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    width: 100%;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 10px;
-}
-#absensi-form button:hover, #laporan-controls button:hover {
-    background: #6e3510;
-}
-/* Toast Notification Style */
 #toast {
     visibility: hidden;
     min-width: 250px;
@@ -191,20 +143,16 @@ body {
 }
 #toast.show {
     visibility: visible;
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
-@-webkit-keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
 @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-@-webkit-keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
 @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="banner">
-    <h1>ABSENSI ANGKkringan</h1>
-    <p>Jam Kerja: 17:00 - 03:00</p>
+    <h1>ABSENSI ANGKRINGAN</h1>
     <div id="status-ringkas" style="font-size:14px; margin-top:10px; font-weight:bold; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px;">
         Memuat status hari ini...
     </div>
@@ -218,9 +166,9 @@ body {
   
   <div class="grid">
     <div class="card-action" onclick="tampilkanRanking()">🏆 Statistik Total</div>
-    <div class="card-action" onclick="tampilkanLaporanBulanan()">🧾 Laporan Bulanan & Ekspor</div>
+    <div class="card-action" onclick="tampilkanLaporanBulanan()">🧾 Laporan Bulanan</div>
     <div class="card-action" onclick="tampilkanStatus()">📋 Status Jadwal</div>
-    <div class="card-action" onclick="resetData()">⚠️ Reset Data</div>
+    <div class="card-action" onclick="tampilkanPengaturan()">🎨 Pengaturan Tema</div>
   </div>
   
   <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -231,626 +179,159 @@ body {
         <option value="nama_asc">Nama (A-Z)</option>
     </select>
   </div>
-
   <div id="riwayat"></div>
 </div>
 
 <div id="overlay"></div>
-<div id="toast"></div> <script>
-// --- KONFIGURASI APLIKASI ---
-// Waktu batas awal masuk kerja dan batas keterlambatan
-const WAKTU_TOLERANSI = "17:00"; // Absen setelah ini = Terlambat
-// Rentang waktu jam kerja (Absen Sekarang hanya bisa di jam ini)
-const JAM_KERJA_MULAI = "17:00"; 
-const JAM_KERJA_SELESAI = "03:00"; // Pagi hari berikutnya
+<div id="toast"></div>
 
+<script>
+// Data absensi
 let data = JSON.parse(localStorage.getItem("absensi") || "[]");
 let karyawan = ["Lala", "Zaki", "Kemi", "Haris", "Izzul", "Fawaz"]; 
 let mode = null;
 let pengganti = null;
 let filterAktif = "Semua Karyawan";
 
-// JADWAL MINGGUAN (TIDAK BERUBAH)
-const JadwalMingguan = {
-    "Senin": ["Lala", "Zaki", "Kemi"],
-    "Selasa": ["Lala", "Haris", "Izzul"],
-    "Rabu": ["Haris", "Kemi", "Zaki"],
-    "Kamis": ["Fawaz", "Zaki", "Izzul"],
-    "Jumat": ["Lala", "Haris", "Fawaz"],
-    "Sabtu": ["Lala", "Zaki", "Fawaz", "Kemi", "Izzul", "Haris"],
-    "Minggu": ["Fawaz", "Izzul"]
-};
-// ----------------------------
+// Tema & Background
+let savedTheme = localStorage.getItem("theme") || "default";
+let savedBg = localStorage.getItem("backgroundImage") || null;
 
-// =================================================================
-// UTILITY FUNCTIONS
-// =================================================================
-
-function todayDate(){ return new Date().toISOString().split('T')[0]; }
-
-function getTodayDayName(){
-    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-    return days[new Date().getDay()];
+function applySavedTheme(){
+  if(savedTheme==="gelap"){ document.body.style.background="#1c1c1e"; document.body.style.color="white"; }
+  else if(savedTheme==="terang"){ document.body.style.background="#ffffff"; document.body.style.color="#000"; }
+  else { document.body.style.background="var(--bg)"; document.body.style.color="var(--text)"; }
 }
+function applySavedBackground(){
+  if(savedBg){
+    document.body.style.backgroundImage=`url('${savedBg}')`;
+    document.body.style.backgroundSize="cover";
+    document.body.style.backgroundAttachment="fixed";
+  }
+}
+applySavedTheme();
+applySavedBackground();
 
+// Utils
+function todayDate(){ return new Date().toISOString().split('T')[0]; }
 function showToast(message) {
     const toast = document.getElementById("toast");
     toast.innerHTML = message;
     toast.className = "show";
-    setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+    setTimeout(()=>{ toast.className = toast.className.replace("show", ""); }, 3000);
 }
+function tutupOverlay(){ document.getElementById("overlay").style.display="none"; mode = null; pengganti = null; }
 
-function tutupOverlay(){
-  document.getElementById("overlay").style.display="none";
-  mode = null; 
-  pengganti = null; 
-}
-
-// =================================================================
-// LOGIKA JAM KERJA BARU
-// =================================================================
-
-function checkJamKerja(waktu, tanggal = todayDate()) {
-    const [startHour, startMinute] = JAM_KERJA_MULAI.split(':').map(Number);
-    const [endHour, endMinute] = JAM_KERJA_SELESAI.split(':').map(Number);
-    
-    // Waktu yang di cek
-    const cekTime = new Date(`${tanggal}T${waktu}:00`);
-    
-    // Tentukan batas waktu mulai dan selesai
-    const startTime = new Date(cekTime);
-    startTime.setHours(startHour, startMinute, 0);
-
-    const endTime = new Date(cekTime);
-    endTime.setHours(endHour, endMinute, 0);
-
-    // Jika jam selesai (03:00) lebih kecil dari jam mulai (17:00), artinya jam selesai di hari berikutnya
-    if (endHour < startHour) {
-        if (cekTime.getHours() >= startHour) {
-            // Jika jam saat ini antara 17:00 dan 23:59 (masih hari yang sama)
-            if (cekTime.getTime() >= startTime.getTime()) return true;
-        } else {
-            // Jika jam saat ini antara 00:00 dan 03:00 (sudah hari berikutnya)
-            if (cekTime.getTime() <= endTime.getTime()) return true;
-        }
-    } else {
-        // Logika normal jika jam selesai > jam mulai (tidak terjadi di kasus ini, tapi untuk safety)
-        if (cekTime.getTime() >= startTime.getTime() && cekTime.getTime() <= endTime.getTime()) return true;
-    }
-    
-    return false;
-}
-
-function isTerlambat(waktuAbsen) {
-    // Keterlambatan dihitung dari batas awal jam kerja (17:00)
-    return waktuAbsen > WAKTU_TOLERANSI;
-}
-
-
-// =================================================================
-// UTAMA: TAMPILKAN RIWAYAT & SORTING
-// =================================================================
-
+// Tampilan riwayat
 function tampilkan(){
   let wrap = document.getElementById("riwayat");
   wrap.innerHTML = "";
   document.getElementById('filter-status').innerText = filterAktif;
-
-  // 1. Filter Data
-  let dataYangDitampilkan = data;
-  if (filterAktif !== "Semua Karyawan") {
-    dataYangDitampilkan = data.filter(d => 
-        (d.jenis === "Absen" && d.nama === filterAktif) || 
-        (d.jenis === "Gantikan" && (d.pengganti === filterAktif || d.digantikan === filterAktif))
-    );
-  }
-  
-  // 2. Sorting Data
-  const jenisSort = document.getElementById('sort-riwayat').value;
-  const dataTampil = [...dataYangDitampilkan].sort((a, b) => {
-    const timeA = new Date(`${a.tanggal} ${a.waktu}`).getTime();
-    const timeB = new Date(`${b.tanggal} ${b.waktu}`).getTime();
-
-    if (jenisSort === "terbaru") return timeB - timeA;
-    if (jenisSort === "terlama") return timeA - timeB;
-    if (jenisSort === "nama_asc") {
-        const namaA = a.nama || a.pengganti;
-        const namaB = b.nama || b.pengganti;
-        if (namaA < namaB) return -1;
-        if (namaA > namaB) return 1;
-        return 0;
-    }
-    return timeB - timeA;
-  });
-
-  // 3. Tampilkan di DOM
+  let dataTampil = [...data];
   dataTampil.forEach(d => {
     let div = document.createElement("div");
-    let kelasTambahan = '';
-    if (d.jenis === 'Absen' && d.status === 'Terlambat') {
-        kelasTambahan = ' terlambat';
-    }
-    div.className = `riwayat-item ${d.jenis.toLowerCase()}${kelasTambahan}`; 
-    
-    const indexHapus = data.findIndex(item => 
-        item.jenis === d.jenis && item.waktu === d.waktu && item.tanggal === d.tanggal &&
-        (item.nama === d.nama || (item.pengganti === d.pengganti && item.digantikan === d.digantikan))
-    );
-
-    let content = "";
-    if(d.jenis === "Absen"){
-        const statusText = d.status === 'Terlambat' ? `<span style="color:var(--accent-red); font-weight:bold;"> (Terlambat)</span>` : '';
-        content = `
-            <div><strong>${d.nama} Absen Hadir</strong>${statusText}
-            <span>Pukul ${d.waktu} | Tanggal ${d.tanggal}</span></div>
-        `;
-    } else {
-        content = `
-            <div><strong>${d.pengganti} Gantikan ${d.digantikan}</strong>
-            <span>Ganti Shift Pukul ${d.waktu} | Tanggal ${d.tanggal}</span></div>
-        `;
-    }
-    
-    div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            ${content}
-            <div 
-                onclick="hapusRiwayat(${indexHapus})" 
-                style="color:var(--accent-red); cursor:pointer; font-weight:bold; padding: 5px 0px 5px 10px; font-size:14px;"
-            >
-                ❌
-            </div>
-        </div>
-    `;
-
+    div.className = `riwayat-item ${d.jenis.toLowerCase()}`;
+    div.innerHTML = `<div><strong>${d.nama||d.pengganti} ${d.jenis}</strong><br><span>${d.tanggal} ${d.waktu}</span></div>`;
     wrap.appendChild(div);
   });
-  
-  if (dataTampil.length === 0) {
-      wrap.innerHTML = `<p style="text-align:center; color:var(--muted);">Tidak ada riwayat untuk ${filterAktif}.</p>`;
-  }
-  updateStatusRingkas();
 }
 
-function hapusRiwayat(index) {
-    if (confirm("Yakin ingin menghapus riwayat ini?")) {
-        data.splice(index, 1);
-        localStorage.setItem("absensi", JSON.stringify(data));
-        showToast("Riwayat berhasil dihapus.");
-        tampilkan();
-    }
-}
-
-function mulaiFilterRiwayat(){
-  mode = "filter";
-  const opsiFilter = ["Semua Karyawan", ...karyawan];
-  tampilOverlayPilih(opsiFilter, "🔎 Filter Riwayat Berdasarkan:");
-}
-
-function filterRiwayat(nama){
-  filterAktif = nama;
-  tampilkan();
-  tutupOverlay();
-}
-
-// =================================================================
-// PROSES ABSENSI
-// =================================================================
-
+// Proses absen
 function absen(nama, tanggal, waktu) {
-    const statusTerlambat = isTerlambat(waktu) ? "Terlambat" : "Tepat Waktu";
-    
-    if(data.some(a => a.nama === nama && a.tanggal === tanggal && a.jenis === "Absen")){
-      showToast(nama + ` sudah Absen pada tanggal ${tanggal}.`);
-      return;
-    }
-
-    data.push({
-      nama, 
-      waktu,
-      tanggal, 
-      jenis: "Absen",
-      status: statusTerlambat
-    });
-
-    showToast(`✅ ${nama} berhasil Absen (${statusTerlambat})`);
-    
+    data.push({nama, waktu, tanggal, jenis: "Absen"});
     localStorage.setItem("absensi", JSON.stringify(data));
+    showToast(`✅ ${nama} berhasil Absen`);
     tampilkan();
 }
-
 function mulaiAbsen(){
     const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
-    
-    if (!checkJamKerja(waktuSekarang)) {
-        showToast(`❌ Absen Hanya Bisa Dilakukan pada jam ${JAM_KERJA_MULAI} sampai ${JAM_KERJA_SELESAI}.`);
-        return;
-    }
-
     mode="absen";
-    const hariIni = todayDate();
-    const hadirHariIni = data
-        .filter(d => d.tanggal === hariIni && d.jenis === "Absen")
-        .map(d => d.nama);
-        
-    tampilOverlayPilih(karyawan,"👋 Pilih Karyawan yang Absen", hadirHariIni);
+    tampilOverlayPilih(karyawan,"👋 Pilih Karyawan yang Absen");
 }
-
 function mulaiAbsenTanggalLain() {
     mode = "absenLain";
-    const ov = document.getElementById("overlay");
     const hariIni = todayDate();
     const waktuSekarang = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-
+    let ov=document.getElementById("overlay");
     ov.innerHTML = `
         <h3>🗓️ Absen Tanggal & Waktu Lain</h3>
         <form id="absensi-form" onsubmit="event.preventDefault(); prosesAbsenLain()">
-            <label for="karyawan-select">Pilih Karyawan:</label>
-            <select id="karyawan-select" required>
-                <option value="">-- Pilih Nama --</option>
-                ${karyawan.map(n => `<option value="${n}">${n}</option>`).join('')}
-            </select>
-
-            <label for="tgl-absen">Tanggal Absen (Max Hari Ini):</label>
-            <input type="date" id="tgl-absen" max="${hariIni}" value="${hariIni}" required>
-
-            <label for="wkt-absen">Waktu Absen:</label>
-            <input type="time" id="wkt-absen" value="${waktuSekarang}" required>
-
-            <button type="submit">Absen Sekarang</button>
+            <select id="karyawan-select">${karyawan.map(n => `<option value="${n}">${n}</option>`).join('')}</select>
+            <input type="date" id="tgl-absen" value="${hariIni}">
+            <input type="time" id="wkt-absen" value="${waktuSekarang}">
+            <button type="submit">Absen</button>
         </form>
     `;
-
     let batal=document.createElement("div");
-    batal.className="batal-btn-overlay";
-    batal.innerText="Batal";
-    batal.onclick=tutupOverlay;
-    ov.appendChild(batal);
-    
-    ov.style.display="block";
+    batal.className="batal-btn-overlay"; batal.innerText="Batal"; batal.onclick=tutupOverlay;
+    ov.appendChild(batal); ov.style.display="block";
 }
-
 function prosesAbsenLain() {
     const nama = document.getElementById('karyawan-select').value;
     const tanggal = document.getElementById('tgl-absen').value;
     const waktu = document.getElementById('wkt-absen').value;
-
-    if (!nama || !tanggal || !waktu) {
-        showToast("Semua field harus diisi.");
-        return;
-    }
-
     absen(nama, tanggal, waktu);
     tutupOverlay();
 }
-
-function tampilOverlayPilih(list,judul="Pilih Karyawan", hadirList = []){
+function tampilOverlayPilih(list,judul="Pilih Karyawan"){
   let ov=document.getElementById("overlay");
   ov.innerHTML=`<h3>${judul}</h3>`;
   list.forEach(n=>{
-    const sudahHadir = hadirList.includes(n);
     let item=document.createElement("div");
-    item.className=`list-item ${sudahHadir ? 'status-hadir' : ''}`;
-    item.innerHTML = `<span>${n}</span><span>${sudahHadir ? 'Sudah Hadir' : 'Pilih'}</span>`;
-    if (!sudahHadir) {
-        item.onclick=()=>pilihNama(n);
-    } else {
-        item.style.cursor = "not-allowed";
-        item.style.opacity = "0.6";
-    }
+    item.className="list-item";
+    item.innerHTML = `<span>${n}</span>`;
+    item.onclick=()=>{pilihNama(n);};
     ov.appendChild(item);
   });
   let batal=document.createElement("div");
-  batal.className="batal-btn-overlay";
-  batal.innerText="Batal";
-  batal.onclick=tutupOverlay;
-  ov.appendChild(batal);
-  ov.style.display="block";
+  batal.className="batal-btn-overlay"; batal.innerText="Batal"; batal.onclick=tutupOverlay;
+  ov.appendChild(batal); ov.style.display="block";
 }
-
 function pilihNama(nama){
   if(mode==="absen"){
     const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
     absen(nama, todayDate(), waktuSekarang);
-  } else if(mode==="gantikan1"){
-    pengganti=nama;
-    mode="gantikan2";
-    tampilOverlayPilih(karyawan.filter(x=>x!==nama),"Pilih yang Digantikan");
-  } else if(mode==="gantikan2"){
-    gantikan(pengganti,nama);
-  } else if(mode==="filter"){
-    filterRiwayat(nama);
   }
   tutupOverlay();
 }
 
-function mulaiGantikan(){
-  mode = "gantikan1";
-  const hariIni = todayDate();
-  const hadirHariIni = data
-      .filter(d => d.tanggal === hariIni && (d.jenis === 'Absen' || d.jenis === 'Gantikan'))
-      .map(d => d.nama || d.pengganti);
-  
-  const belumHadir = karyawan.filter(k => !hadirHariIni.includes(k));
-  tampilOverlayPilih(belumHadir, "🔁 Siapa yang Menggantikan?");
+// ================= Pengaturan Tema ==================
+function tampilkanPengaturan(){
+  let ov=document.getElementById("overlay");
+  ov.innerHTML=`
+    <h3>🎨 Pengaturan Tampilan</h3>
+    <label>Pilih Tema:</label>
+    <select id="tema-select" onchange="gantiTema()">
+      <option value="default" ${savedTheme==="default"?"selected":""}>Default</option>
+      <option value="gelap" ${savedTheme==="gelap"?"selected":""}>Gelap</option>
+      <option value="terang" ${savedTheme==="terang"?"selected":""}>Terang</option>
+    </select>
+    <br><br>
+    <label>Upload Foto Latar:</label>
+    <input type="file" id="bg-upload" accept="image/*" onchange="gantiBackground(event)">
+    <div class="batal-btn-overlay" onclick="tutupOverlay()">Tutup</div>
+  `;
+  ov.style.display="block";
 }
-
-
-function gantikan(pengganti,digantikan){
-  let hariIni=todayDate();
-  let waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
-  data.push({pengganti,digantikan, waktu:waktuSekarang, tanggal:hariIni, jenis:"Gantikan"});
-  localStorage.setItem("absensi",JSON.stringify(data));
-  showToast(`${pengganti} berhasil menggantikan ${digantikan}.`);
-  tampilkan();
-  tutupOverlay();
+function gantiTema(){
+  let tema=document.getElementById("tema-select").value;
+  savedTheme=tema;
+  localStorage.setItem("theme",tema);
+  applySavedTheme();
 }
-
-function resetData(){
-  if(confirm("Yakin reset SEMUA data absensi? Tindakan ini tidak bisa dibatalkan.")){
-    data=[];
-    localStorage.removeItem("absensi");
-    filterAktif = "Semua Karyawan";
-    tampilkan();
-    showToast("Data absensi berhasil direset.");
+function gantiBackground(e){
+  let file=e.target.files[0];
+  if(file){
+    let reader=new FileReader();
+    reader.onload=function(ev){
+      savedBg=ev.target.result;
+      localStorage.setItem("backgroundImage",savedBg);
+      applySavedBackground();
+    };
+    reader.readAsDataURL(file);
   }
 }
-
-// =================================================================
-// LAPORAN & EKSPOR CSV (Revisi)
-// =================================================================
-
-function tampilkanLaporanBulanan() {
-    let ov = document.getElementById("overlay");
-    const today = new Date();
-
-    ov.innerHTML = `
-        <h3>🧾 Laporan Absensi Bulanan</h3>
-        <div id="laporan-controls">
-            <label for="bulan-tahun">Pilih Bulan:</label>
-            <select id="bulan-tahun" onchange="prosesLaporanBulanan()">
-                ${Array.from({length: 12}).map((_, i) => {
-                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                    const year = d.getFullYear();
-                    const month = d.getMonth() + 1;
-                    const monthName = d.toLocaleDateString('id-ID', { month: 'long' });
-                    const val = `${year}-${String(month).padStart(2, '0')}`;
-                    const selected = (i === 0) ? 'selected' : '';
-                    return `<option value="${val}" ${selected}>${monthName} ${year}</option>`;
-                }).join('')}
-            </select>
-            <button onclick="eksporDataCSV()">⬇️ Ekspor CSV Bulan Ini</button>
-        </div>
-        <div id="hasil-laporan" style="margin-top: 20px;"></div>
-    `;
-    
-    let batal=document.createElement("div");
-    batal.className="batal-btn-overlay";
-    batal.innerText="Tutup Laporan";
-    batal.onclick=tutupOverlay;
-    ov.appendChild(batal);
-    ov.style.display="block";
-
-    prosesLaporanBulanan(); // Tampilkan laporan default
-}
-
-function prosesLaporanBulanan() {
-    const bulanTahun = document.getElementById('bulan-tahun').value;
-    const [year, month] = bulanTahun.split('-');
-
-    const dataBulanIni = data.filter(d => d.tanggal.startsWith(bulanTahun));
-    
-    let stats = {};
-    karyawan.forEach(k => {
-        stats[k] = { hadir: 0, terlambat: 0, menggantikan: 0, digantikan: 0 };
-    });
-    
-    dataBulanIni.forEach(d => {
-        if (d.jenis === 'Absen') {
-            stats[d.nama].hadir++;
-            if (d.status === 'Terlambat') {
-                stats[d.nama].terlambat++;
-            }
-        } else if (d.jenis === 'Gantikan') {
-            stats[d.pengganti].menggantikan++;
-            stats[d.digantikan].digantikan++;
-        }
-    });
-    
-    let hasilDiv = document.getElementById('hasil-laporan');
-    if (dataBulanIni.length === 0) {
-        hasilDiv.innerHTML = `<p style="text-align:center; color:var(--muted);">Tidak ada data untuk bulan ini.</p>`;
-        return;
-    }
-    
-    let html = `<table style="width:100%; border-collapse: collapse;">
-        <thead>
-            <tr style="text-align:left; border-bottom: 2px solid var(--accent-primary);">
-                <th style="padding:8px;">Nama</th>
-                <th style="padding:8px;">Hadir</th>
-                <th style="padding:8px;">Telat</th>
-                <th style="padding:8px;">Ganti</th>
-                <th style="padding:8px;">Diganti</th>
-            </tr>
-        </thead><tbody>`;
-        
-    karyawan.forEach(k => {
-        const s = stats[k];
-        html += `<tr style="border-bottom: 1px solid var(--bg);">
-            <td style="padding:8px; font-weight:bold;">${k}</td>
-            <td style="padding:8px;">${s.hadir}</td>
-            <td style="padding:8px;">${s.terlambat}</td>
-            <td style="padding:8px;">${s.menggantikan}</td>
-            <td style="padding:8px;">${s.digantikan}</td>
-        </tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    hasilDiv.innerHTML = html;
-}
-
-function eksporDataCSV() {
-    const bulanTahun = document.getElementById('bulan-tahun').value;
-    const dataBulanIni = data.filter(d => d.tanggal.startsWith(bulanTahun));
-
-    if (dataBulanIni.length === 0) {
-        showToast("Tidak ada data untuk diekspor pada bulan ini.");
-        return;
-    }
-    
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Jenis,Tanggal,Waktu,Nama/Pengganti,Digantikan,Status\n";
-
-    dataBulanIni.forEach(d => {
-        let row;
-        if (d.jenis === "Absen") {
-            row = ["Absen", d.tanggal, d.waktu, d.nama, "", d.status].join(",");
-        } else {
-            row = ["Gantikan", d.tanggal, d.waktu, d.pengganti, d.digantikan, ""].join(",");
-        }
-        csvContent += row + "\n";
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `laporan_absensi_${bulanTahun}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// =================================================================
-// STATISTIK & STATUS
-// =================================================================
-
-function tampilkanRanking() {
-    let stats = {};
-    karyawan.forEach(k => {
-        stats[k] = { hadir: 0, terlambat: 0, menggantikan: 0, digantikan: 0 };
-    });
-    
-    data.forEach(d => {
-        if (d.jenis === 'Absen') {
-            stats[d.nama].hadir++;
-            if (d.status === 'Terlambat') stats[d.nama].terlambat++;
-        } else if (d.jenis === 'Gantikan') {
-            stats[d.pengganti].menggantikan++;
-            stats[d.digantikan].digantikan++;
-        }
-    });
-
-    const sortedKaryawan = [...karyawan].sort((a,b) => stats[b].hadir - stats[a].hadir);
-
-    let ov = document.getElementById("overlay");
-    ov.innerHTML = `<h3>🏆 Statistik Total Kehadiran</h3>`;
-
-    sortedKaryawan.forEach((k, index) => {
-        const s = stats[k];
-        const item = document.createElement('div');
-        item.className = 'list-item';
-        item.innerHTML = `
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:18px; width:25px;">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index+1}`}</span>
-                <div>
-                    <strong>${k}</strong>
-                    <div style="font-size:12px; color:var(--muted);">
-                        Hadir: ${s.hadir} | Terlambat: ${s.terlambat} | Ganti: ${s.menggantikan} | Diganti: ${s.digantikan}
-                    </div>
-                </div>
-            </div>
-        `;
-        ov.appendChild(item);
-    });
-
-    let batal=document.createElement("div");
-    batal.className="batal-btn-overlay";
-    batal.innerText="Tutup";
-    batal.onclick=tutupOverlay;
-    ov.appendChild(batal);
-    ov.style.display="block";
-}
-
-function tampilkanStatus() {
-    const hariIni = getTodayDayName();
-    const tglHariIni = todayDate();
-    const jadwalHariIni = JadwalMingguan[hariIni] || [];
-
-    const hadirHariIni = data
-        .filter(d => d.tanggal === tglHariIni && d.jenis === "Absen")
-        .map(d => d.nama);
-        
-    const penggantianHariIni = data
-        .filter(d => d.tanggal === tglHariIni && d.jenis === "Gantikan");
-
-    const ygDigantikan = penggantianHariIni.map(d => d.digantikan);
-    const ygMenggantikan = penggantianHariIni.map(d => d.pengganti);
-    
-    let ov = document.getElementById("overlay");
-    ov.innerHTML = `<h3>📋 Status Jadwal Hari Ini (${hariIni})</h3>`;
-
-    karyawan.forEach(k => {
-        let statusKelas = '';
-        let statusTeks = 'Tidak ada jadwal';
-        
-        const dijadwalkan = jadwalHariIni.includes(k);
-        const hadir = hadirHariIni.includes(k);
-        const digantikan = ygDigantikan.includes(k);
-        const menggantikan = ygMenggantikan.includes(k);
-        
-        if (hadir) {
-            statusKelas = 'status-hadir';
-            statusTeks = '✅ Hadir';
-        } else if (menggantikan) {
-            statusKelas = 'status-hadir';
-            statusTeks = `🔁 Menggantikan`;
-        } else if (digantikan) {
-            statusKelas = 'status-seharusnya-hadir';
-            statusTeks = '🚫 Digantikan';
-        } else if (dijadwalkan) {
-            statusKelas = 'status-belum-hadir';
-            statusTeks = '❌ Belum Hadir';
-        } else {
-            return; // Jangan tampilkan yang tidak ada jadwal
-        }
-
-        const item = document.createElement('div');
-        item.className = `list-item ${statusKelas}`;
-        item.innerHTML = `<span>${k}</span><span>${statusTeks}</span>`;
-        ov.appendChild(item);
-    });
-    
-    let batal=document.createElement("div");
-    batal.className="batal-btn-overlay";
-    batal.innerText="Tutup";
-    batal.onclick=tutupOverlay;
-    ov.style.display="block";
-}
-
-function updateStatusRingkas() {
-    const ringkasDiv = document.getElementById('status-ringkas');
-    const hariIni = getTodayDayName();
-    const tglHariIni = todayDate();
-    
-    const jadwalHariIni = JadwalMingguan[hariIni] || [];
-    if (jadwalHariIni.length === 0) {
-        ringkasDiv.innerText = "Hari ini tidak ada jadwal kerja.";
-        return;
-    }
-    
-    const hadirAbsen = data.filter(d => d.tanggal === tglHariIni && d.jenis === 'Absen').map(d => d.nama);
-    const hadirGanti = data.filter(d => d.tanggal === tglHariIni && d.jenis === 'Gantikan').map(d => d.pengganti);
-    
-    const totalHadirUnik = new Set([...hadirAbsen, ...hadirGanti]);
-    
-    ringkasDiv.innerText = `Status Hari Ini: ${totalHadirUnik.size} / ${jadwalHariIni.length} Karyawan Hadir`;
-}
-
-
-// Jalankan saat pertama kali halaman dimuat
 document.addEventListener('DOMContentLoaded', tampilkan);
-
 </script>
 </body>
 </html>
-
