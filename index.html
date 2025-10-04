@@ -613,4 +613,244 @@ function tampilkanLaporanBulanan() {
                     const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
                     const year = d.getFullYear();
                     const month = d.getMonth() + 1;
-                    const monthName = d.toLocaleDateString('id-ID', 
+                    const monthName = d.toLocaleDateString('id-ID', { month: 'long' });
+                    const val = `${year}-${String(month).padStart(2, '0')}`;
+                    const selected = (i === 0) ? 'selected' : '';
+                    return `<option value="${val}" ${selected}>${monthName} ${year}</option>`;
+                }).join('')}
+            </select>
+            <button onclick="eksporDataCSV()">⬇️ Ekspor CSV Bulan Ini</button>
+        </div>
+        <div id="hasil-laporan" style="margin-top: 20px;"></div>
+    `;
+    
+    let batal=document.createElement("div");
+    batal.className="batal-btn-overlay";
+    batal.innerText="Tutup Laporan";
+    batal.onclick=tutupOverlay;
+    ov.appendChild(batal);
+    ov.style.display="block";
+
+    prosesLaporanBulanan(); // Tampilkan laporan default
+}
+
+function prosesLaporanBulanan() {
+    const bulanTahun = document.getElementById('bulan-tahun').value;
+    const [year, month] = bulanTahun.split('-');
+
+    const dataBulanIni = data.filter(d => d.tanggal.startsWith(bulanTahun));
+    
+    let stats = {};
+    karyawan.forEach(k => {
+        stats[k] = { hadir: 0, terlambat: 0, menggantikan: 0, digantikan: 0 };
+    });
+    
+    dataBulanIni.forEach(d => {
+        if (d.jenis === 'Absen') {
+            stats[d.nama].hadir++;
+            if (d.status === 'Terlambat') {
+                stats[d.nama].terlambat++;
+            }
+        } else if (d.jenis === 'Gantikan') {
+            stats[d.pengganti].menggantikan++;
+            stats[d.digantikan].digantikan++;
+        }
+    });
+    
+    let hasilDiv = document.getElementById('hasil-laporan');
+    if (dataBulanIni.length === 0) {
+        hasilDiv.innerHTML = `<p style="text-align:center; color:var(--muted);">Tidak ada data untuk bulan ini.</p>`;
+        return;
+    }
+    
+    let html = `<table style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align:left; border-bottom: 2px solid var(--accent-primary);">
+                <th style="padding:8px;">Nama</th>
+                <th style="padding:8px;">Hadir</th>
+                <th style="padding:8px;">Telat</th>
+                <th style="padding:8px;">Ganti</th>
+                <th style="padding:8px;">Diganti</th>
+            </tr>
+        </thead><tbody>`;
+        
+    karyawan.forEach(k => {
+        const s = stats[k];
+        html += `<tr style="border-bottom: 1px solid var(--bg);">
+            <td style="padding:8px; font-weight:bold;">${k}</td>
+            <td style="padding:8px;">${s.hadir}</td>
+            <td style="padding:8px;">${s.terlambat}</td>
+            <td style="padding:8px;">${s.menggantikan}</td>
+            <td style="padding:8px;">${s.digantikan}</td>
+        </tr>`;
+    });
+    
+    html += `</tbody></table>`;
+    hasilDiv.innerHTML = html;
+}
+
+function eksporDataCSV() {
+    const bulanTahun = document.getElementById('bulan-tahun').value;
+    const dataBulanIni = data.filter(d => d.tanggal.startsWith(bulanTahun));
+
+    if (dataBulanIni.length === 0) {
+        showToast("Tidak ada data untuk diekspor pada bulan ini.");
+        return;
+    }
+    
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Jenis,Tanggal,Waktu,Nama/Pengganti,Digantikan,Status\n";
+
+    dataBulanIni.forEach(d => {
+        let row;
+        if (d.jenis === "Absen") {
+            row = ["Absen", d.tanggal, d.waktu, d.nama, "", d.status].join(",");
+        } else {
+            row = ["Gantikan", d.tanggal, d.waktu, d.pengganti, d.digantikan, ""].join(",");
+        }
+        csvContent += row + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `laporan_absensi_${bulanTahun}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// =================================================================
+// STATISTIK & STATUS
+// =================================================================
+
+function tampilkanRanking() {
+    let stats = {};
+    karyawan.forEach(k => {
+        stats[k] = { hadir: 0, terlambat: 0, menggantikan: 0, digantikan: 0 };
+    });
+    
+    data.forEach(d => {
+        if (d.jenis === 'Absen') {
+            stats[d.nama].hadir++;
+            if (d.status === 'Terlambat') stats[d.nama].terlambat++;
+        } else if (d.jenis === 'Gantikan') {
+            stats[d.pengganti].menggantikan++;
+            stats[d.digantikan].digantikan++;
+        }
+    });
+
+    const sortedKaryawan = [...karyawan].sort((a,b) => stats[b].hadir - stats[a].hadir);
+
+    let ov = document.getElementById("overlay");
+    ov.innerHTML = `<h3>🏆 Statistik Total Kehadiran</h3>`;
+
+    sortedKaryawan.forEach((k, index) => {
+        const s = stats[k];
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:18px; width:25px;">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index+1}`}</span>
+                <div>
+                    <strong>${k}</strong>
+                    <div style="font-size:12px; color:var(--muted);">
+                        Hadir: ${s.hadir} | Terlambat: ${s.terlambat} | Ganti: ${s.menggantikan} | Diganti: ${s.digantikan}
+                    </div>
+                </div>
+            </div>
+        `;
+        ov.appendChild(item);
+    });
+
+    let batal=document.createElement("div");
+    batal.className="batal-btn-overlay";
+    batal.innerText="Tutup";
+    batal.onclick=tutupOverlay;
+    ov.appendChild(batal);
+    ov.style.display="block";
+}
+
+function tampilkanStatus() {
+    const hariIni = getTodayDayName();
+    const tglHariIni = todayDate();
+    const jadwalHariIni = JadwalMingguan[hariIni] || [];
+
+    const hadirHariIni = data
+        .filter(d => d.tanggal === tglHariIni && d.jenis === "Absen")
+        .map(d => d.nama);
+        
+    const penggantianHariIni = data
+        .filter(d => d.tanggal === tglHariIni && d.jenis === "Gantikan");
+
+    const ygDigantikan = penggantianHariIni.map(d => d.digantikan);
+    const ygMenggantikan = penggantianHariIni.map(d => d.pengganti);
+    
+    let ov = document.getElementById("overlay");
+    ov.innerHTML = `<h3>📋 Status Jadwal Hari Ini (${hariIni})</h3>`;
+
+    karyawan.forEach(k => {
+        let statusKelas = '';
+        let statusTeks = 'Tidak ada jadwal';
+        
+        const dijadwalkan = jadwalHariIni.includes(k);
+        const hadir = hadirHariIni.includes(k);
+        const digantikan = ygDigantikan.includes(k);
+        const menggantikan = ygMenggantikan.includes(k);
+        
+        if (hadir) {
+            statusKelas = 'status-hadir';
+            statusTeks = '✅ Hadir';
+        } else if (menggantikan) {
+            statusKelas = 'status-hadir';
+            statusTeks = `🔁 Menggantikan`;
+        } else if (digantikan) {
+            statusKelas = 'status-seharusnya-hadir';
+            statusTeks = '🚫 Digantikan';
+        } else if (dijadwalkan) {
+            statusKelas = 'status-belum-hadir';
+            statusTeks = '❌ Belum Hadir';
+        } else {
+            return; // Jangan tampilkan yang tidak ada jadwal
+        }
+
+        const item = document.createElement('div');
+        item.className = `list-item ${statusKelas}`;
+        item.innerHTML = `<span>${k}</span><span>${statusTeks}</span>`;
+        ov.appendChild(item);
+    });
+    
+    let batal=document.createElement("div");
+    batal.className="batal-btn-overlay";
+    batal.innerText="Tutup";
+    batal.onclick=tutupOverlay;
+    ov.style.display="block";
+}
+
+function updateStatusRingkas() {
+    const ringkasDiv = document.getElementById('status-ringkas');
+    const hariIni = getTodayDayName();
+    const tglHariIni = todayDate();
+    
+    const jadwalHariIni = JadwalMingguan[hariIni] || [];
+    if (jadwalHariIni.length === 0) {
+        ringkasDiv.innerText = "Hari ini tidak ada jadwal kerja.";
+        return;
+    }
+    
+    const hadirAbsen = data.filter(d => d.tanggal === tglHariIni && d.jenis === 'Absen').map(d => d.nama);
+    const hadirGanti = data.filter(d => d.tanggal === tglHariIni && d.jenis === 'Gantikan').map(d => d.pengganti);
+    
+    const totalHadirUnik = new Set([...hadirAbsen, ...hadirGanti]);
+    
+    ringkasDiv.innerText = `Status Hari Ini: ${totalHadirUnik.size} / ${jadwalHariIni.length} Karyawan Hadir`;
+}
+
+
+// Jalankan saat pertama kali halaman dimuat
+document.addEventListener('DOMContentLoaded', tampilkan);
+
+</script>
+</body>
+</html>
+
