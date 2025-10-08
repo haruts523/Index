@@ -1,1002 +1,1097 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Absensi Angkringan Modern</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2B6CB0">
-<style>
-  :root{
-    --bg: #f3f6fa;
-    --card: #ffffff;
-    --text: #0f1724;
-    --muted: rgba(15,23,36,0.6);
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Absensi Angkringan Modern</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+        /* ========================================================== */
+        /* 1. VARIABEL & RESET DASAR                                  */
+        /* ========================================================== */
+        :root{
+            /* Palet Warna Nuansa Kopi/Angkringan */
+            --bg: #f7f5f3;
+            --card: #ffffff;
+            --text: #1c1c1e;
+            --muted: rgba(28,28,30,0.6);
+            --accent-primary: #8B4513; /* cokelat */
+            --accent-secondary: #D2B48C; /* krem */
+            --accent-red: #ff4d4d;
+            --accent-green: #4CAF50;
+            --accent-orange: #FFC107;
+            --soft-shadow: 0 6px 18px rgba(16,24,40,0.06);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
 
-    --accent-gradient: linear-gradient(135deg,#2B6CB0 0%, #4C7CBD 100%);
-    --accent-start: #2B6CB0;
-    --accent-end: #4C7CBD;
+        *{box-sizing:border-box}
+        body {
+            font-family: var(--font-family);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-    --accent-red: #ff4d4d;
-    --accent-green: #2F855A;
-    --accent-orange: #ED8936;
+        .app {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            padding-bottom: 70px; /* Ruang untuk toast */
+        }
+        
+        /* ========================================================== */
+        /* 2. KOMPONEN UTAMA (BANNER, GRID, CARD)                     */
+        /* ========================================================== */
+        .banner {
+            background: linear-gradient(135deg, var(--accent-primary), #6d350f);
+            color: white;
+            border-radius: 14px;
+            padding: 22px 18px;
+            text-align: center;
+            margin-bottom: 18px;
+            box-shadow: var(--soft-shadow);
+        }
+        
+        .banner #status-ringkas {
+            font-size: 14px; 
+            margin-top: 10px; 
+            font-weight: 700; 
+            background: rgba(255,255,255,0.08); 
+            display:inline-block;
+            padding: 8px 10px; 
+            border-radius: 8px;
+        }
 
-    --soft-shadow: 0 6px 20px rgba(16,24,40,0.06);
-    font-family: Inter, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
 
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    display:flex;
-    justify-content:center;
-    padding:18px;
-    min-height:100vh;
-    background-size:cover;
-    background-attachment:fixed;
-  }
-  .app{ width:100%; max-width:920px; margin:0 auto; }
+        .grid-three {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
 
-  .banner{
-    border-radius:14px;
-    padding:22px;
-    color:white;
-    background: var(--accent-gradient);
-    box-shadow: var(--soft-shadow);
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:center;
-    margin-bottom:16px;
-  }
-  .banner h1{ margin:0; font-size:20px; letter-spacing:0.4px; }
-  .banner .sub{ font-size:13px; opacity:0.95 }
+        .card-action {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 12px 10px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: var(--soft-shadow);
+            font-weight: 700;
+            transition: transform 0.18s, background-color 0.18s;
+            font-size: 14px; 
+            user-select: none;
+        }
 
-  .grid{ display:grid; gap:12px; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); margin-bottom:16px; }
-  .card-action{
-    background:var(--card);
-    border-radius:12px;
-    padding:14px;
-    font-weight:700;
-    text-align:center;
-    cursor:pointer;
-    transition: transform .14s ease, box-shadow .14s ease;
-    box-shadow: 0 6px 14px rgba(16,24,40,0.04);
-    user-select:none;
-  }
-  .card-action:active{
-    transform: translateY(2px) scale(.995);
-    box-shadow: 0 0 18px rgba(43,108,176,0.12);
-  }
-  .card-action.small{ padding:10px; font-weight:600; }
+        .card-action:active {
+            transform: scale(0.98);
+            background-color: var(--bg); 
+        }
 
-  .big-action{
-    grid-column: 1 / -1;
-    font-size: 18px;
-    font-weight: 800;
-    padding: 22px;
-    color: white;
-    background: var(--accent-gradient);
-    border: none;
-    box-shadow: 0 6px 16px rgba(43,108,176,0.28);
-  }
-  .big-action:active{
-    transform: scale(0.97);
-    box-shadow: 0 0 18px rgba(43,108,176,0.28);
-  }
+        .section-title { 
+            font-weight: 800; 
+            margin: 8px 4px 12px; 
+            font-size: 18px; 
+            color: var(--accent-primary);
+        }
+        
+        /* Tombol Absen Besar */
+        .card-action.absen-btn {
+            font-size: 20px;
+            padding: 18px 12px;
+            background: linear-gradient(180deg, var(--accent-green), #3b8e3b);
+            color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(76,175,80,0.12);
+            transform-origin: center;
+        }
 
-  .section-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin:12px 0; }
-  .section-title{ color:var(--accent-start); font-weight:800; cursor:pointer; }
+        .card-action.absen-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
 
-  #riwayat{ margin-bottom:24px; }
-  .riwayat-item{
-    background:var(--card);
-    border-radius:10px;
-    padding:12px;
-    box-shadow: 0 6px 12px rgba(16,24,40,0.04);
-    margin-bottom:10px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-  }
-  .riwayat-item .meta{ color:var(--muted); font-size:13px; }
-  .btn-icon{ background:none; border:none; cursor:pointer; font-size:16px; }
+        /* Animasi tekan */
+        .card-action.absen-btn:active {
+            animation: pressPulse 260ms ease;
+        }
 
-  #overlay{
-    display:none;
-    position:fixed; inset:0;
-    z-index:2000;
-    background: rgba(255,255,255,0.96);
-    padding:20px;
-    overflow:auto;
-  }
-  .overlay-inner{ max-width:820px; margin:0 auto; }
-  .list-item{
-    background:var(--card);
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:8px;
-    cursor:pointer;
-    display:flex; justify-content:space-between; align-items:center;
-    box-shadow: 0 4px 10px rgba(16,24,40,0.04);
-  }
-  .batal-btn-overlay{
-    margin-top:12px;
-    background:var(--accent-red);
-    color:white;
-    padding:12px;
-    border-radius:10px;
-    text-align:center;
-    cursor:pointer;
-    font-weight:700;
-  }
+        @keyframes pressPulse {
+            0% { transform: scale(1); box-shadow: 0 10px 30px rgba(76,175,80,0.12); }
+            50% { transform: scale(0.96); box-shadow: 0 6px 18px rgba(76,175,80,0.08); }
+            100% { transform: scale(1); box-shadow: 0 10px 30px rgba(76,175,80,0.12); }
+        }
 
-  table{ width:100%; border-collapse:collapse; margin-top:12px; background:transparent;}
-  table th, table td{ padding:8px 10px; text-align:left; border-bottom:1px solid #eef2f7; font-size:14px; }
+        /* ========================================================== */
+        /* 3. RIWAYAT ABSENSI                                         */
+        /* ========================================================== */
+        .riwayat-item {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--soft-shadow);
+            border-left: 5px solid transparent;
+        }
 
-  #toast{
-    visibility:hidden;
-    position:fixed; left:50%; transform:translateX(-50%);
-    bottom:26px; z-index:3000; background:#222; color:#fff; padding:12px 18px; border-radius:10px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.18);
-  }
-  #toast.show{ visibility:visible; animation: fadein .3s, fadeout .3s 2.5s; }
-  @keyframes fadein{ from{ opacity:0; transform:translate(-50%,8px)} to{opacity:1; transform:translate(-50%,0)}}
-  @keyframes fadeout{ to{ opacity:0} }
+        .riwayat-item.absen { border-left-color: var(--accent-green); }
+        .riwayat-item.gantikan { border-left-color: var(--accent-orange); }
 
-  @media (max-width:520px){
-    .banner{ flex-direction:column; align-items:flex-start; gap:6px; }
-  }
+        .riwayat-item span {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
 
-  .muted{ color:var(--muted); font-size:13px; }
-  .pill{ background:rgba(0,0,0,0.06); padding:6px 8px; border-radius:8px; font-size:13px; }
+        /* ========================================================== */
+        /* 4. OVERLAY & FORM                                          */
+        /* ========================================================== */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.35);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
 
-  .dark-body{ background:#0b1220 !important; color:#e6eefb !important; }
-  .dark-card{ background:#11151a !important; color:#e6eefb !important; box-shadow:none !important; }
+        #overlay .panel {
+            max-width: 520px;
+            margin: 40px auto;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: var(--soft-shadow);
+        }
+        
+        .list-item {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            font-weight: 600;
+            border-left: 5px solid var(--accent-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .list-item.status-hadir { background-color: #e6ffe6; border-left-color: var(--accent-green); }
+        .list-item.status-belum-hadir { background-color: #fff0f0; border-left-color: var(--accent-red); }
+        .list-item.status-seharusnya-hadir { background-color: #fff8e1; border-left-color: var(--accent-orange); }
 
-  label{ display:block; margin-top:8px; font-weight:600; }
-  input[type="text"], input[type="date"], input[type="time"], select, textarea{
-    width:100%; padding:8px; border-radius:8px; border:1px solid #ddd; margin-top:6px; font-size:14px;
-  }
-  .row{ display:flex; gap:8px; }
-  .col{ flex:1; }
+        .batal-btn-overlay {
+            background: var(--accent-red);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: 700;
+        }
 
-  .day-box{ background:var(--card); padding:10px; border-radius:8px; margin-bottom:8px; box-shadow: 0 3px 8px rgba(16,24,40,0.03); }
-  .small-muted{ font-size:12px; color:var(--muted); }
+        #absensi-form label, #laporan-controls label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--text);
+            font-size: 14px;
+        }
 
-  /* small tweaks for tab buttons */
-  #pengaturan-body .card-action.small{ background:transparent; border:1px solid rgba(0,0,0,0.04); }
-</style>
+        #absensi-form input[type="date"], #absensi-form input[type="time"], #absensi-form select,
+        #laporan-controls select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: #fafafa;
+        }
+
+        #absensi-form button, #laporan-controls button {
+            background: var(--accent-primary);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.18s;
+            margin-top: 6px;
+        }
+
+        #absensi-form button:hover, #laporan-controls button:hover {
+            background: #6e3510;
+        }
+
+        /* Helpers */
+        .row { display:flex; gap:10px; }
+        .col { flex:1; }
+
+        /* ========================================================== */
+        /* 5. TOAST NOTIFICATION                                      */
+        /* ========================================================== */
+        #toast {
+            visibility: hidden;
+            min-width: 260px;
+            margin-left: -130px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 14px;
+            position: fixed;
+            z-index: 2000;
+            left: 50%;
+            bottom: 30px;
+            font-size: 15px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+        }
+
+        #toast.show {
+            visibility: visible;
+            -webkit-animation: fadein 0.4s, fadeout 0.4s 2.4s;
+            animation: fadein 0.4s, fadeout 0.4s 2.4s;
+        }
+
+        @-webkit-keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @-webkit-keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <div class="banner">
-      <div>
-        <h1>ABSENSI ANGRINGAN</h1>
-        <div class="sub">Absen bebas — bisa kapan saja</div>
-      </div>
-      <div style="text-align:right">
-        <div id="status-ringkas" class="pill">Memuat status...</div>
-        <div style="height:6px"></div>
-        <div class="muted" style="font-size:12px">Pengaturan: <span id="current-theme">Default</span></div>
-      </div>
+    <div class="app">
+        <div class="banner">
+            <h1 style="margin:0; letter-spacing:0.6px;">ABSENSI ANGGKRINGAN</h1>
+            <p style="margin:6px 0 0 0; opacity:0.95; font-weight:600;">Jam Kerja Fleksibel — Bisa Absen Kapan Saja</p>
+            <div id="status-ringkas">
+                Memuat status hari ini...
+            </div>
+        </div>
+        
+        <div class="grid grid-three" style="margin-bottom:14px;">
+            <div class="card-action absen-btn" onclick="mulaiAbsen()">👋 Absen Sekarang</div>
+            <div class="card-action" onclick="mulaiAbsenTanggalLain()">🗓️ Absen / Gantikan</div>
+            <div class="card-action" onclick="mulaiGantikanQuick()">🔁 Gantikan Cepat</div>
+        </div>
+        
+        <div class="grid" style="margin-bottom:12px;">
+            <div class="card-action" onclick="tampilkanRanking()">🏆 Statistik Total</div>
+            <div class="card-action" onclick="tampilkanLaporanBulanan()">🧾 Laporan Bulanan & Ekspor</div>
+            <div class="card-action" onclick="tampilkanStatus()">📋 Status Jadwal</div>
+            <div class="card-action" onclick="resetData()">⚠️ Reset Data</div>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="section-title" onclick="mulaiFilterRiwayat()">Riwayat Absensi (<span id="filter-status">Semua Karyawan</span>)</div>
+            <select id="sort-riwayat" onchange="tampilkan()" style="padding:8px; border-radius:8px; border:1px solid #e6e6e6;">
+                <option value="terbaru">Terbaru</option>
+                <option value="terlama">Terlama</option>
+                <option value="nama_asc">Nama (A-Z)</option>
+            </select>
+        </div>
+
+        <div id="riwayat"></div>
     </div>
 
-    <div class="grid">
-      <div class="card-action big-action" onclick="mulaiAbsen()">👋 Absen Sekarang</div>
-      <div class="card-action" onclick="mulaiAbsenTanggalLain()">🗓️ Absen Tanggal Lain</div>
-      <div class="card-action" onclick="mulaiGantikan()">🔁 Gantikan</div>
-      <div class="card-action" onclick="tampilkanRanking()">🏆 Statistik Total</div>
-      <div class="card-action" onclick="tampilkanLaporanBulanan()">🧾 Laporan Bulanan</div>
-      <div class="card-action" onclick="tampilkanStatus()">📋 Status</div>
-      <div class="card-action" onclick="tampilkanPengaturan()">⚙️ Pengaturan</div>
-    </div>
+    <div id="overlay"></div>
+    <div id="toast"></div> 
 
-    <div class="section-row">
-      <div class="section-title" onclick="mulaiFilterRiwayat()">Riwayat Absensi (<span id="filter-status">Semua</span>)</div>
-      <div style="display:flex; gap:8px; align-items:center">
-        <select id="sort-riwayat" onchange="tampilkan()" class="pill">
-          <option value="terbaru">Terbaru</option>
-          <option value="terlama">Terlama</option>
-          <option value="nama_asc">Nama (A-Z)</option>
-        </select>
-        <button class="card-action small" onclick="tampilkanLaporanBulanan()">Lihat Laporan</button>
-      </div>
-    </div>
+    <script>
+        // ----------------------------
+        // KONFIGURASI & DATA AWAL
+        // ----------------------------
+        // Tidak ada lagi logika telat — semua dianggap tepat waktu
+        function isTerlambat(/*waktuAbsen*/) { return false; }
 
-    <div id="riwayat"></div>
-  </div>
+        let data = JSON.parse(localStorage.getItem("absensi") || "[]");
+        let karyawan = ["Lala", "Zaki", "Kemi", "Haris", "Izzul", "Fawaz"];
+        let mode = null;
+        let pengganti = null;
+        let filterAktif = "Semua Karyawan";
 
-  <div id="overlay"><div class="overlay-inner"></div></div>
-  <div id="toast"></div>
+        // Load / Simpan Jadwal Mingguan (persist di localStorage)
+        const defaultJadwal = {
+            "Senin": ["Lala", "Zaki", "Kemi"],
+            "Selasa": ["Lala", "Haris", "Izzul"],
+            "Rabu": ["Haris", "Kemi", "Zaki"],
+            "Kamis": ["Fawaz", "Zaki", "Izzul"],
+            "Jumat": ["Lala", "Haris", "Fawaz"],
+            "Sabtu": ["Lala", "Zaki", "Fawaz", "Kemi", "Izzul", "Haris"],
+            "Minggu": ["Fawaz", "Izzul"]
+        };
 
-<script>
-// ===================== Storage keys & defaults =====================
-const STORAGE_ABSENSI = 'absensi';
-const STORAGE_KARYAWAN = 'karyawan';
-const STORAGE_THEME = 'theme';
-const STORAGE_BG = 'backgroundImage';
-const STORAGE_JADWAL = 'jadwalMingguan';
-const STORAGE_SETTINGS = 'appSettings';
+        function loadJadwal() {
+            const raw = localStorage.getItem('jadwalMingguan');
+            if(!raw) {
+                localStorage.setItem('jadwalMingguan', JSON.stringify(defaultJadwal));
+                return JSON.parse(JSON.stringify(defaultJadwal));
+            }
+            try {
+                const parsed = JSON.parse(raw);
+                // Ensure keys exist
+                ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"].forEach(d=>{
+                    if(!Array.isArray(parsed[d])) parsed[d] = [];
+                });
+                return parsed;
+            } catch(e) {
+                localStorage.setItem('jadwalMingguan', JSON.stringify(defaultJadwal));
+                return JSON.parse(JSON.stringify(defaultJadwal));
+            }
+        }
 
-// initial data (load from localStorage)
-let data = JSON.parse(localStorage.getItem(STORAGE_ABSENSI) || '[]');
-let karyawan = JSON.parse(localStorage.getItem(STORAGE_KARYAWAN) || '["Lala","Zaki","Kemi","Haris","Izzul","Fawaz"]');
+        function saveJadwal(jadwal){
+            localStorage.setItem('jadwalMingguan', JSON.stringify(jadwal));
+        }
 
-// Jadwal mingguan: load or initialize
-let jadwalMingguan = JSON.parse(localStorage.getItem(STORAGE_JADWAL) || 'null');
-if(!jadwalMingguan){
-  jadwalMingguan = {
-    "Senin": [],
-    "Selasa": [],
-    "Rabu": [],
-    "Kamis": [],
-    "Jumat": [],
-    "Sabtu": [],
-    "Minggu": []
-  };
-  localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
-}
+        let JadwalMingguan = loadJadwal();
 
-// settings
-let settings = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || 'null');
-if(!settings){
-  settings = {
-    batasAbsenAktif: false,
-    batasAbsenJam: '09:00',
-    notifikasiSuara: true
-  };
-  localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
-}
+        // ----------------------------
+        // UTILITIES
+        // ----------------------------
+        function todayDate(){ return new Date().toISOString().split('T')[0]; }
 
-let mode = null;
-let pengganti = null;
-let filterAktif = "Semua";
-let savedTheme = localStorage.getItem(STORAGE_THEME) || 'blue';
-let savedBg = localStorage.getItem(STORAGE_BG) || null;
+        function getTodayDayName(){
+            const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            return days[new Date().getDay()];
+        }
 
-// ===================== Utilities =====================
-function todayDate(){ return new Date().toISOString().slice(0,10); }
-function nowTime(){ return new Date().toLocaleTimeString('id-ID',{hour12:false,hour:'2-digit',minute:'2-digit'}); }
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.className='show'; setTimeout(()=>t.className='',(3000)); }
-function tutupOverlay(){ document.getElementById('overlay').style.display='none'; document.querySelector('#overlay .overlay-inner').innerHTML=''; mode=null; pengganti=null; }
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerHTML = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 2600);
+        }
 
-// Play short click sound using Web Audio (no file needed)
-function playClick(){
-  try{
-    const s = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}');
-    if(s && s.notifikasiSuara === false) return;
-  }catch(e){}
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'square';
-    o.frequency.value = 1000;
-    g.gain.value = 0.00001;
-    o.connect(g); g.connect(ctx.destination);
-    const now = ctx.currentTime;
-    g.gain.setValueAtTime(0.00001, now);
-    g.gain.exponentialRampToValueAtTime(0.05, now + 0.001);
-    o.start(now);
-    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.06);
-    o.stop(now + 0.07);
-    // close context shortly after
-    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 120);
-  }catch(err){}
-}
+        function tutupOverlay(){
+            document.getElementById("overlay").style.display="none";
+            document.getElementById("overlay").innerHTML = "";
+            mode = null; 
+            pengganti = null; 
+        }
 
-// ===================== Render Riwayat =====================
-function tampilkan(){
-  const wrap = document.getElementById('riwayat');
-  wrap.innerHTML = '';
-  document.getElementById('filter-status').textContent = filterAktif;
+        // ----------------------------
+        // TAMPILKAN RIWAYAT
+        // ----------------------------
+        function tampilkan(){
+            let wrap = document.getElementById("riwayat");
+            wrap.innerHTML = "";
+            document.getElementById('filter-status').innerText = filterAktif;
 
-  let arr = data.slice();
-  if(filterAktif !== 'Semua'){
-    arr = arr.filter(d => (d.jenis === 'Absen' && d.nama === filterAktif) || (d.jenis === 'Gantikan' && (d.pengganti === filterAktif || d.digantikan === filterAktif)));
-  }
+            let dataYangDitampilkan = data;
+            if (filterAktif !== "Semua Karyawan") {
+                dataYangDitampilkan = data.filter(d => 
+                    (d.jenis === "Absen" && d.nama === filterAktif) || 
+                    (d.jenis === "Gantikan" && (d.pengganti === filterAktif || d.digantikan === filterAktif))
+                );
+            }
+            
+            const jenisSort = document.getElementById('sort-riwayat') ? document.getElementById('sort-riwayat').value : 'terbaru';
+            const dataTampil = [...dataYangDitampilkan].sort((a, b) => {
+                const timeA = new Date(`${a.tanggal} ${a.waktu}`).getTime();
+                const timeB = new Date(`${b.tanggal} ${b.waktu}`).getTime();
 
-  const sort = document.getElementById('sort-riwayat').value;
-  arr.sort((a,b)=>{
-    const ta = new Date((a.tanggal||'1970-01-01') + 'T' + (a.waktu||'00:00')).getTime();
-    const tb = new Date((b.tanggal||'1970-01-01') + 'T' + (b.waktu||'00:00')).getTime();
-    if(sort === 'terbaru') return tb - ta;
-    if(sort === 'terlama') return ta - tb;
-    if(sort === 'nama_asc') return (a.nama||a.pengganti||'').localeCompare(b.nama||b.pengganti||'');
-    return tb - ta;
-  });
+                if (jenisSort === "terbaru") return timeB - timeA;
+                if (jenisSort === "terlama") return timeA - timeB;
+                if (jenisSort === "nama_asc") {
+                    const namaA = a.nama || a.pengganti;
+                    const namaB = b.nama || b.pengganti;
+                    if (namaA < namaB) return -1;
+                    if (namaA > namaB) return 1;
+                    return 0;
+                }
+                return timeB - timeA;
+            });
 
-  if(arr.length === 0){
-    wrap.innerHTML = '<p class="muted" style="text-align:center">Belum ada riwayat untuk filter ini.</p>';
-    updateStatusRingkas();
-    return;
-  }
+            dataTampil.forEach((d, idx) => {
+                let div = document.createElement("div");
+                let kelasTambahan = '';
+                if (d.jenis === 'Absen') kelasTambahan = ' absen';
+                if (d.jenis === 'Gantikan') kelasTambahan = ' gantikan';
 
-  arr.forEach(entry => {
-    const box = document.createElement('div'); box.className = 'riwayat-item';
-    const left = document.createElement('div');
-    if(entry.jenis === 'Absen'){
-      left.innerHTML = `<strong>${entry.nama}</strong> <div class="small-muted">(Absen)</div><div class="meta">${entry.tanggal} • ${entry.waktu}</div>`;
-    } else {
-      left.innerHTML = `<strong>${entry.pengganti}</strong> <div class="small-muted">ganti ${entry.digantikan}</div><div class="meta">${entry.tanggal} • ${entry.waktu}</div>`;
-    }
-    const right = document.createElement('div');
-    const del = document.createElement('button'); del.className='btn-icon'; del.innerText='❌'; del.title='Hapus entri';
-    del.onclick = ()=>hapusRiwayat(entry);
-    right.appendChild(del);
-    box.appendChild(left); box.appendChild(right);
-    wrap.appendChild(box);
-  });
+                div.className = `riwayat-item${kelasTambahan}`; 
+                
+                let content = "";
+                if(d.jenis === "Absen"){
+                    content = `
+                        <div><strong>${d.nama} — Absen</strong>
+                        <span>Pukul ${d.waktu} | Tanggal ${d.tanggal}</span></div>
+                    `;
+                } else {
+                    content = `
+                        <div><strong>${d.pengganti} menggantikan ${d.digantikan}</strong>
+                        <span>Pukul ${d.waktu} | Tanggal ${d.tanggal}</span></div>
+                    `;
+                }
+                
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        ${content}
+                        <div 
+                            onclick="hapusRiwayat(${idx})" 
+                            style="color:var(--accent-red); cursor:pointer; font-weight:bold; padding: 6px 0 6px 10px; font-size:14px;"
+                        >
+                            ❌
+                        </div>
+                    </div>
+                `;
 
-  updateStatusRingkas();
-}
+                wrap.appendChild(div);
+            });
+            
+            if (dataTampil.length === 0) {
+                wrap.innerHTML = `<p style="text-align:center; color:var(--muted);">Tidak ada riwayat untuk ${filterAktif}.</p>`;
+            }
+            updateStatusRingkas();
+        }
 
-function hapusRiwayat(obj){
-  if(!confirm('Yakin menghapus entri ini?')) return;
-  data = data.filter(d => JSON.stringify(d) !== JSON.stringify(obj));
-  localStorage.setItem(STORAGE_ABSENSI, JSON.stringify(data));
-  tampilkan();
-  showToast('Entri dihapus');
-}
+        function mulaiFilterRiwayat(){
+            mode = "filter";
+            const opsiFilter = ["Semua Karyawan", ...karyawan];
+            tampilOverlayPilih(opsiFilter, "🔎 Filter Riwayat Berdasarkan:");
+        }
 
-// ===================== Absen (core + wrapper untuk batas waktu & suara) =====================
-function coreAbsen(nama, tanggal, waktu){
-  // prevent duplicate same person same date
-  if(data.some(d => d.jenis === 'Absen' && d.nama === nama && d.tanggal === tanggal)){
-    showToast(`${nama} sudah terdaftar hadir pada ${tanggal}`);
-    return;
-  }
-  const entry = { jenis: 'Absen', nama, tanggal, waktu };
-  data.push(entry);
-  localStorage.setItem(STORAGE_ABSENSI, JSON.stringify(data));
-  tampilkan();
-  showToast(`${nama} berhasil absen`);
-}
+        function filterRiwayat(nama){
+            filterAktif = nama;
+            tampilkan();
+            tutupOverlay();
+        }
 
-function absen(nama, tanggal, waktu){
-  // check batas waktu
-  const s = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}');
-  if(s && s.batasAbsenAktif && tanggal === todayDate()){
-    const batas = s.batasAbsenJam || '09:00';
-    const wShort = (waktu||'00:00').slice(0,5);
-    if(wShort > batas){
-      showToast(`Absen diblokir — lewat batas waktu (${batas})`);
-      return;
-    }
-  }
-  // play click if allowed
-  try{ if(settings.notifikasiSuara) playClick(); }catch(e){}
-  coreAbsen(nama, tanggal, waktu);
-}
+        function hapusRiwayat(index) {
+            if (index < 0 || index >= data.length) {
+                showToast("Data tidak ditemukan.");
+                return;
+            }
+            if (confirm(`Yakin ingin menghapus riwayat absensi ini?`)) {
+                data.splice(index, 1);
+                localStorage.setItem("absensi", JSON.stringify(data));
+                showToast("Riwayat berhasil dihapus.");
+                tampilkan();
+            }
+        }
 
-function mulaiAbsen(){
-  mode = 'absen';
-  const hadirHariIni = data.filter(d => d.tanggal === todayDate() && d.jenis === 'Absen').map(d => d.nama);
-  tampilOverlayPilih(karyawan, '👋 Pilih Karyawan yang Absen', hadirHariIni);
-}
+        // ----------------------------
+        // ABSEN & GANTIKAN (TERPADU)
+        // ----------------------------
+        function absen(nama, tanggal, waktu) {
+            if(data.some(a => a.nama === nama && a.tanggal === tanggal && a.jenis === "Absen")){
+                showToast(nama + ` sudah Absen pada tanggal ${tanggal}.`);
+                return;
+            }
 
-function mulaiAbsenTanggalLain(){
-  mode = 'absenLain';
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `
-    <h3>🗓️ Absen Tanggal & Waktu Lain</h3>
-    <label>Pilih Karyawan:</label>
-    <select id="absen-lain-nama">${karyawan.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
-    <label>Tanggal (maks hari ini):</label>
-    <input type="date" id="absen-lain-tgl" max="${todayDate()}" value="${todayDate()}">
-    <label>Waktu:</label>
-    <input type="time" id="absen-lain-wkt" value="${nowTime()}">
-    <div style="margin-top:12px"><button class="card-action" id="simpan-absen-lain">Simpan Absen</button></div>
-  `;
-  document.getElementById('simpan-absen-lain').onclick = ()=>{
-    const nama = document.getElementById('absen-lain-nama').value;
-    const tgl = document.getElementById('absen-lain-tgl').value;
-    const wkt = document.getElementById('absen-lain-wkt').value;
-    if(!nama || !tgl || !wkt){ showToast('Lengkapi data absen'); return; }
-    absen(nama, tgl, wkt);
-    tutupOverlay();
-  };
-  const b = document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Batal'; b.onclick=tutupOverlay;
-  ovInner.appendChild(b);
-  document.getElementById('overlay').style.display = 'block';
-}
+            data.push({
+                nama, 
+                waktu,
+                tanggal, 
+                jenis: "Absen",
+                status: "Tepat Waktu"
+            });
 
-function tampilOverlayPilih(list, judul, hadirList = []){
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `<h3>${judul}</h3>`;
-  list.forEach(name=>{
-    const el = document.createElement('div'); el.className='list-item';
-    const sudah = hadirList.includes(name);
-    el.innerHTML = `<div>${name}</div><div class="muted">${sudah ? 'Sudah' : 'Pilih'}</div>`;
-    if(!sudah) el.onclick = ()=>pilihNama(name);
-    else { el.style.cursor='not-allowed'; el.style.opacity=0.6; }
-    ovInner.appendChild(el);
-  });
-  const b = document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Batal'; b.onclick=tutupOverlay;
-  ovInner.appendChild(b);
-  document.getElementById('overlay').style.display = 'block';
-}
+            showToast(`✅ ${nama} berhasil Absen`);
+            localStorage.setItem("absensi", JSON.stringify(data));
+            tampilkan();
+        }
 
-function pilihNama(nama){
-  if(mode === 'absen'){
-    absen(nama, todayDate(), nowTime());
-  } else if(mode === 'gantikan1'){
-    pengganti = nama;
-    mode = 'gantikan2';
-    const others = karyawan.filter(k => k !== pengganti);
-    tampilOverlayPilih(others, `🔁 ${pengganti} menggantikan siapa?`);
-    return;
-  } else if(mode === 'gantikan2'){
-    // fallback
-    gantikan(pengganti, nama);
-  }
-  tutupOverlay();
-}
+        function gantikan(pengganti,digantikan,tanggal,waktu){
+            data.push({pengganti,digantikan, waktu:waktu, tanggal:tanggal, jenis:"Gantikan"});
+            localStorage.setItem("absensi",JSON.stringify(data));
+            showToast(`${pengganti} berhasil menggantikan ${digantikan}.`);
+            tampilkan();
+        }
 
-// ===================== Gantikan =====================
-function mulaiGantikan(){
-  mode = 'gantikan1';
-  tampilOverlayPilih(karyawan, '🔁 Siapa yang Menggantikan?');
-}
+        function mulaiAbsen(){
+            // Absen cepat: pilih nama langsung (waktu & tanggal otomatis sekarang)
+            mode="absen";
+            const hariIni = todayDate();
+            const hadirHariIni = data
+                .filter(d => d.tanggal === hariIni && d.jenis === "Absen")
+                .map(d => d.nama);
+            tampilOverlayPilih(karyawan,"👋 Pilih Karyawan yang Absen", hadirHariIni);
+        }
 
-function gantikan(penggantiNama, digantikanNama){
-  if(!penggantiNama || !digantikanNama){ showToast('Pilihan pengganti/digantikan tidak valid'); return; }
-  data.push({ jenis: 'Gantikan', pengganti: penggantiNama, digantikan: digantikanNama, tanggal: todayDate(), waktu: nowTime() });
-  localStorage.setItem(STORAGE_ABSENSI, JSON.stringify(data));
-  tampilkan();
-  showToast(`${penggantiNama} menggantikan ${digantikanNama}`);
-  tutupOverlay();
-}
+        // FORM TERPADU: Absen Lain / Gantikan
+        function mulaiAbsenTanggalLain() {
+            mode = "absenLain";
+            const ov = document.getElementById("overlay");
+            const hariIni = todayDate();
+            const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
-// ===================== Reset Data (used elsewhere) =====================
-function resetAllData(){
-  if(!confirm('Yakin menghapus semua data absensi?')) return;
-  data = [];
-  localStorage.removeItem(STORAGE_ABSENSI);
-  tampilkan();
-  showToast('Semua data absensi dihapus');
-}
+            ov.innerHTML = `
+                <div class="panel">
+                    <h3 style="margin-top:0;">🗓️ Absen / Gantikan (Form Terpadu)</h3>
+                    <form id="absensi-form" onsubmit="event.preventDefault(); prosesAbsenLain()">
+                        <label>Jenis:</label>
+                        <div style="display:flex; gap:8px; margin-bottom:12px;">
+                            <label style="flex:1"><input type="radio" name="jenis-absen" value="absen" checked> Absen Biasa</label>
+                            <label style="flex:1"><input type="radio" name="jenis-absen" value="gantikan"> Gantikan</label>
+                        </div>
 
-// ===================== Laporan Bulanan (dengan Export + Reset) =====================
-function tampilkanLaporanBulanan(){
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  const now = new Date();
-  let options = '';
-  for(let i=0;i<12;i++){
-    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    options += `<option value="${val}" ${i===0?'selected':''}>${d.toLocaleDateString('id-ID',{month:'long', year:'numeric'})}</option>`;
-  }
-  ovInner.innerHTML = `
-    <h3>🧾 Laporan Bulanan</h3>
-    <label>Pilih Bulan:</label>
-    <select id="lap-bulan">${options}</select>
-    <div id="hasil-laporan" style="margin-top:12px"></div>
-    <div style="display:flex; gap:8px; margin-top:12px">
-      <button class="card-action" id="export-csv">⬇️ Ekspor CSV Bulan Ini</button>
-      <button class="card-action" id="reset-data-small" style="background:#ffcccb; color:#000">⚠️ Reset Data</button>
-    </div>
-  `;
-  document.getElementById('export-csv').onclick = eksportCSVFromLaporan;
-  document.getElementById('reset-data-small').onclick = ()=>{
-    if(confirm('Reset semua data absensi?')){
-      resetAllData();
-      tutupOverlay();
-    }
-  };
-  document.getElementById('overlay').style.display = 'block';
-  prosesLaporanBulanan();
-}
+                        <div id="form-absen-biasa">
+                            <label for="karyawan-select">Pilih Karyawan (Absen):</label>
+                            <select id="karyawan-select" required>
+                                <option value="">-- Pilih Nama --</option>
+                                ${karyawan.map(n => `<option value="${n}">${n}</option>`).join('')}
+                            </select>
+                        </div>
 
-function prosesLaporanBulanan(){
-  const sel = document.getElementById('lap-bulan');
-  if(!sel) return;
-  const val = sel.value; const [y,m] = val.split('-'); const prefix = `${y}-${m}`;
-  const dataBulan = data.filter(d => d.tanggal && d.tanggal.startsWith(prefix));
-  const stats = {};
-  karyawan.forEach(k => stats[k] = { hadir:0, menggantikan:0, digantikan:0 });
-  dataBulan.forEach(d=>{
-    if(d.jenis === 'Absen' && stats[d.nama]) stats[d.nama].hadir++;
-    if(d.jenis === 'Gantikan'){
-      if(stats[d.pengganti]) stats[d.pengganti].menggantikan++;
-      if(stats[d.digantikan]) stats[d.digantikan].digantikan++;
-    }
-  });
-  const hasil = document.getElementById('hasil-laporan');
-  if(dataBulan.length === 0){
-    hasil.innerHTML = `<p class="muted">Tidak ada data untuk bulan ini.</p>`;
-    return;
-  }
-  let html = `<table><thead><tr><th>Nama</th><th>Hadir</th><th>Ganti</th><th>Diganti</th></tr></thead><tbody>`;
-  karyawan.forEach(k=>{
-    const s = stats[k];
-    html += `<tr><td>${k}</td><td>${s.hadir}</td><td>${s.menggantikan}</td><td>${s.digantikan}</td></tr>`;
-  });
-  html += `</tbody></table>`;
-  hasil.innerHTML = html;
-}
+                        <div id="form-gantikan" style="display:none;">
+                            <label for="pengganti-select">Pengganti (yang datang):</label>
+                            <select id="pengganti-select">
+                                <option value="">-- Pilih Pengganti --</option>
+                                ${karyawan.map(n => `<option value="${n}">${n}</option>`).join('')}
+                            </select>
 
-function eksportCSVFromLaporan(){
-  const sel = document.getElementById('lap-bulan');
-  if(!sel){ showToast('Pilih bulan dulu'); return; }
-  const prefix = sel.value;
-  const dataBulan = data.filter(d => d.tanggal && d.tanggal.startsWith(prefix));
-  if(dataBulan.length === 0){ showToast('Tidak ada data untuk diekspor'); return; }
-  let csv = 'Jenis,Tanggal,Waktu,Nama/Pengganti,Digantikan\n';
-  dataBulan.forEach(d=>{
-    if(d.jenis === 'Absen') csv += `Absen,${d.tanggal},${d.waktu},${d.nama},\n`;
-    else csv += `Gantikan,${d.tanggal},${d.waktu},${d.pengganti},${d.digantikan}\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `laporan_absensi_${prefix}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-  showToast('CSV diunduh');
-}
+                            <label for="digantikan-select">Digantikan (yang tidak masuk):</label>
+                            <select id="digantikan-select">
+                                <option value="">-- Pilih yang Digantikan --</option>
+                                ${karyawan.map(n => `<option value="${n}">${n}</option>`).join('')}
+                            </select>
+                        </div>
 
-// ===================== Statistik / Ranking =====================
-function tampilkanRanking(){
-  const stats = {};
-  karyawan.forEach(k => stats[k] = { hadir:0, menggantikan:0, digantikan:0 });
-  data.forEach(d=>{
-    if(d.jenis === 'Absen' && stats[d.nama]) stats[d.nama].hadir++;
-    if(d.jenis === 'Gantikan'){
-      if(stats[d.pengganti]) stats[d.pengganti].menggantikan++;
-      if(stats[d.digantikan]) stats[d.digantikan].digantikan++;
-    }
-  });
-  const order = [...karyawan].sort((a,b) => stats[b].hadir - stats[a].hadir);
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `<h3>🏆 Statistik Total Kehadiran</h3>`;
-  order.forEach((k,i)=>{
-    const s = stats[k];
-    const div = document.createElement('div'); div.className='list-item';
-    div.innerHTML = `<div><strong>${i<3 ? (i===0?'🥇':i===1?'🥈':'🥉') : '#'+(i+1)} ${k}</strong><div class="muted">Hadir:${s.hadir} • Ganti:${s.menggantikan} • Diganti:${s.digantikan}</div></div>`;
-    ovInner.appendChild(div);
-  });
-  const b = document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Tutup'; b.onclick=tutupOverlay;
-  ovInner.appendChild(b);
-  document.getElementById('overlay').style.display = 'block';
-}
+                        <label for="tgl-absen">Tanggal:</label>
+                        <input type="date" id="tgl-absen" max="${hariIni}" value="${hariIni}" required>
 
-// ===================== Status Ringkas & Filter Riwayat =====================
-function updateStatusRingkas(){
-  const hadirHariIni = data.filter(d => d.tanggal === todayDate() && d.jenis === 'Absen').length;
-  document.getElementById('status-ringkas').textContent = `${hadirHariIni} hadir hari ini`;
-}
+                        <label for="wkt-absen">Waktu (HH:MM):</label>
+                        <input type="time" id="wkt-absen" value="${waktuSekarang}" required>
 
-function mulaiFilterRiwayat(){
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `<h3>Filter Riwayat</h3><div style="margin-top:8px"></div>`;
-  const body = ovInner.querySelector('div');
-  const allBtn = document.createElement('div'); allBtn.className='list-item'; allBtn.innerText='Semua'; allBtn.onclick = ()=>{ filterAktif='Semua'; tutupOverlay(); tampilkan(); };
-  body.appendChild(allBtn);
-  karyawan.forEach(n=>{
-    const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<strong>${n}</strong><div class="muted">Filter untuk ${n}</div>`;
-    el.onclick = ()=>{ filterAktif = n; tutupOverlay(); tampilkan(); };
-    body.appendChild(el);
-  });
-  const b = document.createElement('div'); b.className='batal-btn-overlay'; b.innerText='Batal'; b.onclick=tutupOverlay;
-  ovInner.appendChild(b);
-  document.getElementById('overlay').style.display = 'block';
-}
+                        <button type="submit">Proses</button>
+                    </form>
 
-// ===================== PENGATURAN LENGKAP (Tab) =====================
+                    <div class="batal-btn-overlay" onclick="tutupOverlay()" style="margin-top:10px;">Batal</div>
+                </div>
+            `;
 
-// applyTheme & inisialisasi tema (biru–abu default)
-function applyTheme(theme, bg){
-  const body = document.body;
-  // reset any custom accent changes
-  document.documentElement.style.removeProperty('--accent-start');
-  document.documentElement.style.removeProperty('--accent-end');
+            // toggle form bagian berdasarkan jenis
+            setTimeout(()=>{ // allow DOM insert
+                const radios = document.querySelectorAll('input[name="jenis-absen"]');
+                radios.forEach(r=>{
+                    r.addEventListener('change', ()=>{
+                        const val = document.querySelector('input[name="jenis-absen"]:checked').value;
+                        document.getElementById('form-absen-biasa').style.display = val === 'absen' ? 'block' : 'none';
+                        document.getElementById('form-gantikan').style.display = val === 'gantikan' ? 'block' : 'none';
+                    });
+                });
+            },50);
 
-  body.classList.remove('dark-body');
-  document.querySelectorAll('.card-action, .riwayat-item, .list-item, .day-box').forEach(el=>el.classList.remove('dark-card'));
+            ov.style.display="block";
+        }
 
-  if(theme === 'dark'){
-    body.classList.add('dark-body');
-    document.querySelectorAll('.card-action, .riwayat-item, .list-item, .day-box').forEach(el=>el.classList.add('dark-card'));
-    document.getElementById('current-theme').textContent = 'Gelap';
-    // keep accent but darker
-    document.documentElement.style.setProperty('--accent-start', '#1F2937');
-    document.documentElement.style.setProperty('--accent-end', '#334155');
-  } else if(theme === 'blue'){
-    // default blue theme
-    document.documentElement.style.setProperty('--accent-start', '#2B6CB0');
-    document.documentElement.style.setProperty('--accent-end', '#4C7CBD');
-    document.getElementById('current-theme').textContent = 'Biru–Abu';
-  } else if(theme === 'coklat'){
-    document.documentElement.style.setProperty('--accent-start', '#5A2E0A');
-    document.documentElement.style.setProperty('--accent-end', '#B65C1E');
-    document.getElementById('current-theme').textContent = 'Coklat';
-  } else {
-    document.getElementById('current-theme').textContent = 'Default';
-  }
+        function prosesAbsenLain(){
+            const jenis = document.querySelector('input[name="jenis-absen"]:checked').value;
+            const tanggal = document.getElementById('tgl-absen').value;
+            const waktu = document.getElementById('wkt-absen').value;
 
-  if(bg){
-    body.style.backgroundImage = `url(${bg})`;
-    body.style.backgroundRepeat = 'no-repeat';
-    body.style.backgroundSize = 'cover';
-  } else {
-    body.style.backgroundImage = 'none';
-  }
+            if(jenis === 'absen'){
+                const nama = document.getElementById('karyawan-select').value;
+                if(!nama){ showToast("Pilih karyawan untuk absen."); return; }
+                absen(nama,tanggal,waktu);
+                tutupOverlay();
+            } else {
+                const pengg = document.getElementById('pengganti-select').value;
+                const dig = document.getElementById('digantikan-select').value;
+                if(!pengg || !dig){ showToast("Pilih pengganti dan yang digantikan."); return; }
+                if(pengg === dig){ showToast("Pengganti tidak boleh sama dengan yang digantikan."); return; }
+                gantikan(pengg, dig, tanggal, waktu);
+                tutupOverlay();
+            }
+        }
 
-  savedTheme = theme;
-  savedBg = bg || null;
-  localStorage.setItem(STORAGE_THEME, savedTheme);
-  localStorage.setItem(STORAGE_BG, savedBg || '');
-}
+        // Quick gantikan (memakai overlay pilih 2 nama berurutan)
+        function mulaiGantikanQuick(){
+            mode="gantikanQuick";
+            tampilOverlayPilih(karyawan,"🔁 Pilih Pengganti (yang datang)");
+        }
 
-applyTheme(savedTheme || 'blue', savedBg || null);
+        // Overlay pilihan nama generik
+        function tampilOverlayPilih(list,judul="Pilih Karyawan", hadirList = []){
+            let ov=document.getElementById("overlay");
+            ov.innerHTML = `<div class="panel"><h3 style="margin-top:0;">${judul}</h3></div>`;
+            const panel = ov.querySelector('.panel');
 
-// Tampilkan Pengaturan (tabbed)
-function tampilkanPengaturan(){
-  mode = null; pengganti = null;
-  const ovInner = document.querySelector('#overlay .overlay-inner');
-  ovInner.innerHTML = `
-    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap">
-      <button class="card-action small" id="tab-karyawan">👥 Karyawan</button>
-      <button class="card-action small" id="tab-jadwal">🗓️ Jadwal Mingguan</button>
-      <button class="card-action small" id="tab-tampilan">🎨 Tampilan</button>
-      <button class="card-action small" id="tab-batas">⏰ Batas Waktu Absen</button>
-      <button class="card-action small" id="tab-backup">💾 Backup & Restore</button>
-      <button class="card-action small" id="tab-lainnya">⚙️ Lainnya</button>
-    </div>
-    <div id="pengaturan-body"></div>
-  `;
-  document.getElementById('overlay').style.display = 'block';
-  document.getElementById('tab-karyawan').onclick = renderKaryawanSettings;
-  document.getElementById('tab-jadwal').onclick = renderJadwalSettings;
-  document.getElementById('tab-tampilan').onclick = renderTampilanSettings;
-  document.getElementById('tab-batas').onclick = renderBatasWaktuSettings;
-  document.getElementById('tab-backup').onclick = renderBackupSettings;
-  document.getElementById('tab-lainnya').onclick = renderLainnyaSettings;
-  renderKaryawanSettings();
-}
+            list.forEach(n=>{
+                const sudahHadir = hadirList.includes(n);
+                let item=document.createElement("div");
+                item.className=`list-item ${sudahHadir ? 'status-hadir' : ''}`;
+                item.innerHTML = `<span>${n}</span><span style="font-weight:700;">${sudahHadir ? 'Sudah Hadir' : 'Pilih'}</span>`;
+                item.onclick=()=>pilihNama(n);
+                panel.appendChild(item);
+            });
 
-// Karyawan
-function renderKaryawanSettings(){
-  const body = document.getElementById('pengaturan-body');
-  body.innerHTML = `
-    <h3>👥 Kelola Karyawan</h3>
-    <div id="karyawan-list" style="margin-top:8px"></div>
-    <label>Tambah Karyawan:</label>
-    <div style="display:flex; gap:8px; margin-top:6px">
-      <input type="text" id="input-nama-baru" placeholder="Nama baru...">
-      <button class="card-action" id="btn-tambah-nama">➕ Tambah</button>
-    </div>
-    <div style="margin-top:10px; display:flex; gap:8px">
-      <button class="card-action" id="btn-simpan-karyawan">Simpan & Tutup</button>
-      <button class="card-action" id="btn-reset-karyawan" style="background:#ffcccb; color:#000">Reset Karyawan Default</button>
-    </div>
-  `;
-  refreshKaryawanListUI();
+            let batal=document.createElement("div");
+            batal.className="batal-btn-overlay";
+            batal.innerText="Batal";
+            batal.onclick=tutupOverlay;
+            panel.appendChild(batal);
 
-  document.getElementById('btn-tambah-nama').onclick = ()=>{
-    const v = document.getElementById('input-nama-baru').value.trim();
-    if(!v){ showToast('Masukkan nama'); return; }
-    if(karyawan.includes(v)){ showToast('Nama sudah ada'); return; }
-    karyawan.push(v);
-    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    document.getElementById('input-nama-baru').value = '';
-    refreshKaryawanListUI();
-    showToast('Karyawan ditambahkan');
-  };
+            ov.style.display="block";
+        }
 
-  document.getElementById('btn-simpan-karyawan').onclick = ()=>{
-    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    showToast('Perubahan karyawan disimpan');
-    tutupOverlay();
-    tampilkan();
-  };
+        function pilihNama(nama){
+            if(mode==="absen"){
+                const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                absen(nama, todayDate(), waktuSekarang);
+                tutupOverlay();
+            } else if(mode==="gantikan1"){
+                pengganti=nama;
+                mode="gantikan2";
+                tampilOverlayPilih(karyawan.filter(x=>x!==nama),"Pilih yang Digantikan");
+            } else if(mode==="gantikan2"){
+                gantikan(pengganti,nama,todayDate(), new Date().toLocaleTimeString('id-ID', {hour12:false, hour:'2-digit', minute:'2-digit'}));
+                tutupOverlay();
+            } else if(mode==="gantikanQuick"){
+                // Quick flow: pilih pengganti dulu, lalu pilih digantikan
+                pengganti = nama;
+                mode = "gantikanQuick2";
+                const remaining = karyawan.filter(x=>x!==pengganti);
+                tampilOverlayPilih(remaining, "Pilih yang Digantikan (yang tidak hadir)");
+            } else if(mode==="gantikanQuick2"){
+                const dig = nama;
+                gantikan(pengganti,dig,todayDate(), new Date().toLocaleTimeString('id-ID', {hour12:false, hour:'2-digit', minute:'2-digit'}));
+                tutupOverlay();
+            } else if(mode==="filter"){
+                filterRiwayat(nama);
+            }
+        }
 
-  document.getElementById('btn-reset-karyawan').onclick = ()=>{
-    if(!confirm('Reset daftar karyawan ke default?')) return;
-    karyawan = ["Lala","Zaki","Kemi","Haris","Izzul","Fawaz"];
-    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    refreshKaryawanListUI();
-    showToast('Daftar karyawan direset');
-  };
-}
+        // ----------------------------
+        // RESET DATA
+        // ----------------------------
+        function resetData(){
+            if(confirm("Yakin reset SEMUA data absensi dan jadwal ke default? Tindakan ini tidak bisa dibatalkan.")){
+                data=[];
+                localStorage.removeItem("absensi");
+                localStorage.removeItem("jadwalMingguan");
+                JadwalMingguan = loadJadwal();
+                filterAktif = "Semua Karyawan";
+                tampilkan();
+                showToast("Data absensi & jadwal dikembalikan ke setelan awal.");
+            }
+        }
 
-function refreshKaryawanListUI(){
-  const listWrap = document.getElementById('karyawan-list');
-  listWrap.innerHTML = '';
-  karyawan.forEach((n, idx)=>{
-    const row = document.createElement('div');
-    row.className = 'list-item';
-    row.style.display = 'flex';
-    row.style.alignItems = 'center';
-    row.style.justifyContent = 'space-between';
-    row.innerHTML = `
-      <div style="display:flex; gap:8px; align-items:center; flex:1">
-        <input type="text" data-idx="${idx}" value="${n}" style="flex:1; padding:6px; border-radius:8px; border:1px solid #ddd">
-      </div>
-      <div style="display:flex; gap:6px; margin-left:8px">
-        <button class="card-action small" data-action="save" data-idx="${idx}">Simpan</button>
-        <button class="card-action small" data-action="hapus" data-idx="${idx}" style="background:#ffdddd">Hapus</button>
-      </div>
-    `;
-    listWrap.appendChild(row);
-    row.querySelector('[data-action="save"]').onclick = (e)=>{
-      const i = Number(e.target.dataset.idx);
-      const newName = row.querySelector(`input[data-idx="${i}"]`).value.trim();
-      if(!newName){ showToast('Nama tidak boleh kosong'); return; }
-      if(karyawan.includes(newName) && karyawan[i] !== newName){ showToast('Nama duplikat'); return; }
-      karyawan[i] = newName;
-      localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-      refreshKaryawanListUI();
-      showToast('Nama disimpan');
-    };
-    row.querySelector('[data-action="hapus"]').onclick = (e)=>{
-      const i = Number(e.target.dataset.idx);
-      if(!confirm(`Hapus ${karyawan[i]}?`)) return;
-      karyawan.splice(i,1);
-      localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-      refreshKaryawanListUI();
-      showToast('Karyawan dihapus');
-    };
-  });
-}
+        // ----------------------------
+        // LAPORAN & EKSPOR CSV
+        // ----------------------------
+        function tampilkanLaporanBulanan() {
+            let ov = document.getElementById("overlay");
+            const today = new Date();
 
-// Jadwal Mingguan
-function renderJadwalSettings(){
-  const body = document.getElementById('pengaturan-body');
-  body.innerHTML = `<h3>🗓️ Jadwal Mingguan</h3><div id="jadwal-days" style="margin-top:8px"></div>
-    <div style="display:flex; gap:8px; margin-top:10px">
-      <button class="card-action" id="btn-simpan-jadwal">Simpan Jadwal</button>
-      <button class="card-action" id="btn-bersihkan-jadwal" style="background:#ffcccb; color:#000">Bersihkan Semua</button>
-    </div>
-  `;
-  const wrap = document.getElementById('jadwal-days');
-  wrap.innerHTML = '';
-  const days = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
-  days.forEach(day=>{
-    const box = document.createElement('div');
-    box.className = 'day-box';
-    box.innerHTML = `<strong>${day}</strong><div style="margin-top:8px" id="ch-${day}"></div>`;
-    wrap.appendChild(box);
-    const chWrap = box.querySelector(`#ch-${day}`);
-    karyawan.forEach(k=>{
-      const id = `chk-${day}-${k}`;
-      const checked = (jadwalMingguan[day] || []).includes(k);
-      const el = document.createElement('label');
-      el.style.display='inline-flex';
-      el.style.alignItems='center';
-      el.style.gap='6px';
-      el.style.padding='4px 6px';
-      el.style.marginRight='6px';
-      el.style.borderRadius='8px';
-      el.style.background='rgba(0,0,0,0.03)';
-      el.innerHTML = `<input type="checkbox" id="${id}" data-day="${day}" data-name="${k}" ${checked ? 'checked' : ''}> ${k}`;
-      chWrap.appendChild(el);
-    });
-  });
+            ov.innerHTML = `
+                <div class="panel">
+                    <h3 style="margin-top:0;">🧾 Laporan Absensi Bulanan</h3>
+                    <div id="laporan-controls">
+                        <label for="bulan-tahun">Pilih Bulan:</label>
+                        <select id="bulan-tahun" onchange="prosesLaporanBulanan()">
+                            ${Array.from({length: 12}).map((_, i) => {
+                                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                                const year = d.getFullYear();
+                                const month = d.getMonth() + 1;
+                                const monthName = d.toLocaleDateString('id-ID', { month: 'long' });
+                                const val = `${year}-${String(month).padStart(2, '0')}`;
+                                const selected = (i === 0) ? 'selected' : '';
+                                return `<option value="${val}" ${selected}>${monthName} ${year}</option>`;
+                            }).join('')}
+                        </select>
+                        <button onclick="eksporDataCSV(document.getElementById('bulan-tahun').value)">⬇️ Ekspor CSV Bulan Ini</button>
+                    </div>
+                    <div id="hasil-laporan" style="margin-top: 16px;"></div>
 
-  document.getElementById('btn-simpan-jadwal').onclick = ()=>{
-    const newJ = {};
-    days.forEach(d=>newJ[d]=[]);
-    document.querySelectorAll('input[type="checkbox"]').forEach(chk=>{
-      const day = chk.dataset.day;
-      const name = chk.dataset.name;
-      if(day && name){
-        if(!newJ[day]) newJ[day] = [];
-        if(chk.checked) newJ[day].push(name);
-      }
-    });
-    jadwalMingguan = newJ;
-    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
-    showToast('Jadwal disimpan');
-    tutupOverlay();
-  };
+                    <div class="batal-btn-overlay" onclick="tutupOverlay()" style="margin-top:12px;">Tutup Laporan</div>
+                </div>
+            `;
+            prosesLaporanBulanan(document.getElementById('bulan-tahun').value);
+            ov.style.display="block";
+        }
 
-  document.getElementById('btn-bersihkan-jadwal').onclick = ()=>{
-    if(!confirm('Kosongkan seluruh jadwal mingguan?')) return;
-    days.forEach(d=>jadwalMingguan[d]=[]);
-    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
-    renderJadwalSettings();
-    showToast('Jadwal dikosongkan');
-  };
-}
+        function prosesLaporanBulanan(bulanTahun = null) {
+            if (!bulanTahun) {
+                bulanTahun = document.getElementById('bulan-tahun').value;
+            }
+            
+            const [tahun, bulan] = bulanTahun.split('-').map(Number);
+            const hasilLaporanDiv = document.getElementById('hasil-laporan');
+            
+            const dataBulanIni = data.filter(d => {
+                const [dYear, dMonth] = d.tanggal.split('-').map(Number);
+                return dYear === tahun && dMonth === bulan;
+            });
 
-// Tampilan (tema & background)
-function renderTampilanSettings(){
-  const body = document.getElementById('pengaturan-body');
-  body.innerHTML = `
-    <h3>🎨 Tampilan & Tema</h3>
-    <label>Pilih Tema:</label>
-    <select id="select-theme">
-      <option value="blue">Biru–Abu (Default)</option>
-      <option value="dark">Gelap</option>
-      <option value="coklat">Coklat</option>
-    </select>
+            const stats = {};
+            karyawan.forEach(nama => {
+                stats[nama] = { hadir: 0, terlambat: 0, digantikan: 0, menggantikan: 0 };
+            });
 
-    <label>Background (URL, kosongkan untuk default):</label>
-    <input type="text" id="input-bg-url" placeholder="https://...">
+            dataBulanIni.forEach(d => {
+                if (d.jenis === "Absen") {
+                    if (stats[d.nama]) stats[d.nama].hadir++;
+                } else if (d.jenis === "Gantikan") {
+                    if (stats[d.pengganti]) stats[d.pengganti].menggantikan++;
+                    if (stats[d.digantikan]) stats[d.digantikan].digantikan++;
+                }
+            });
 
-    <div style="display:flex; gap:8px; margin-top:12px">
-      <button class="card-action" id="btn-apply-theme">Terapkan</button>
-      <button class="card-action" id="btn-reset-theme" style="background:#ffcccb; color:#000">Reset Tema</button>
-    </div>
-  `;
-  document.getElementById('select-theme').value = savedTheme || 'blue';
-  document.getElementById('input-bg-url').value = savedBg || '';
+            let html = `<table style="width:100%; border-collapse: collapse; margin-top: 8px;">
+                <thead>
+                    <tr style="background-color: var(--accent-primary); color: white;">
+                        <th style="padding: 10px; border: 1px solid #ddd;">Nama</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Hadir</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Ganti (+/-)</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
-  document.getElementById('btn-apply-theme').onclick = ()=>{
-    const t = document.getElementById('select-theme').value;
-    const bg = document.getElementById('input-bg-url').value.trim();
-    applyTheme(t, bg || null);
-    showToast('Tema diterapkan');
-  };
-  document.getElementById('btn-reset-theme').onclick = ()=>{
-    if(!confirm('Reset tema ke default?')) return;
-    applyTheme('blue', null);
-    localStorage.removeItem(STORAGE_BG);
-    showToast('Tema direset');
-  };
-}
+            karyawan.forEach(nama => {
+                const stat = stats[nama];
+                html += `
+                    <tr style="background-color: var(--card);">
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">${nama}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${stat.hadir}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center; color: var(--accent-orange); font-weight: bold;">+${stat.menggantikan} / -${stat.digantikan}</td>
+                    </tr>
+                `;
+            });
 
-// Batas Waktu Absen
-function renderBatasWaktuSettings(){
-  const s = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}');
-  const body = document.getElementById('pengaturan-body');
-  body.innerHTML = `
-    <h3>⏰ Batas Waktu Absen</h3>
-    <label><input type="checkbox" id="chk-batas" ${s.batasAbsenAktif ? 'checked' : ''}> Aktifkan batas waktu absen</label>
-    <label>Jam batas (HH:MM):</label>
-    <input type="time" id="input-batas-jam" value="${s.batasAbsenJam || '09:00'}">
-    <label style="margin-top:8px"><input type="checkbox" id="chk-suara" ${s.notifikasiSuara ? 'checked' : ''}> Suara notifikasi saat absen berhasil</label>
-    <div style="display:flex; gap:8px; margin-top:12px">
-      <button class="card-action" id="btn-save-batas">Simpan</button>
-    </div>
-  `;
-  document.getElementById('btn-save-batas').onclick = ()=>{
-    const aktif = document.getElementById('chk-batas').checked;
-    const jam = document.getElementById('input-batas-jam').value || '09:00';
-    const suara = document.getElementById('chk-suara').checked;
-    settings.batasAbsenAktif = aktif;
-    settings.batasAbsenJam = jam;
-    settings.notifikasiSuara = suara;
-    localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
-    // update global settings var
-    try{ settings = JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}'); }catch(e){}
-    showToast('Pengaturan batas waktu disimpan');
-    tutupOverlay();
-  };
-}
+            html += `</tbody></table>`;
+            hasilLaporanDiv.innerHTML = html;
+        }
 
-// Backup & Restore
-function renderBackupSettings(){
-  const body = document.getElementById('pengaturan-body');
-  body.innerHTML = `
-    <h3>💾 Backup & Restore</h3>
-    <p class="muted">Ekspor / impor semua data aplikasi (absensi, karyawan, jadwal, theme, settings).</p>
-    <div style="display:flex; gap:8px; margin-top:12px">
-      <button class="card-action" id="btn-export-json">⬇️ Ekspor Semua (JSON)</button>
-      <label style="display:inline-flex; align-items:center; gap:8px">
-        <input type="file" id="file-import" accept="application/json" style="display:none">
-        <button class="card-action" id="btn-trigger-import">⬆️ Impor JSON</button>
-      </label>
-    </div>
-  `;
-  document.getElementById('btn-export-json').onclick = backupExport;
-  document.getElementById('btn-trigger-import').onclick = ()=>{
-    document.getElementById('file-import').click();
-  };
-  document.getElementById('file-import').onchange = backupImport;
-}
+        function eksporDataCSV(bulanTahun) {
+            const [tahun, bulan] = bulanTahun.split('-').map(Number);
+            const dataMentahBulanIni = data.filter(d => {
+                const [dYear, dMonth] = d.tanggal.split('-').map(Number);
+                return dYear === tahun && dMonth === bulan;
+            });
 
-function backupExport(){
-  const payload = {
-    absensi: data,
-    karyawan: karyawan,
-    jadwalMingguan: jadwalMingguan,
-    theme: savedTheme,
-    backgroundImage: savedBg,
-    settings: settings
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `backup_absensi_${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-  showToast('Backup JSON diunduh');
-}
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Tanggal,Jenis,Nama/Pengganti,Waktu,Status/Digantikan\n";
 
-function backupImport(e){
-  const f = e.target.files && e.target.files[0];
-  if(!f) return;
-  if(!confirm('Impor akan menimpa data saat ini. Lanjutkan?')) { e.target.value = ''; return; }
-  const fr = new FileReader();
-  fr.onload = evt=>{
-    try{
-      const obj = JSON.parse(evt.target.result);
-      if(obj.karyawan) { karyawan = obj.karyawan; localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan)); }
-      if(obj.absensi) { data = obj.absensi; localStorage.setItem(STORAGE_ABSENSI, JSON.stringify(data)); }
-      if(obj.jadwalMingguan) { jadwalMingguan = obj.jadwalMingguan; localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan)); }
-      if(obj.theme) { savedTheme = obj.theme; localStorage.setItem(STORAGE_THEME, savedTheme); }
-      if(obj.backgroundImage) { savedBg = obj.backgroundImage; localStorage.setItem(STORAGE_BG, savedBg || ''); }
-      if(obj.settings) { settings = obj.settings; localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings)); }
-      applyTheme(savedTheme || 'blue', savedBg || null);
-      tampilkan();
-      showToast('Impor berhasil');
-      tutupOverlay();
-    }catch(err){
-      console.error(err);
-      showToast('File JSON tidak valid');
-    } finally { e.target.value = ''; }
-  };
-  fr.readAsText(f);
-}
+            dataMentahBulanIni.forEach(d => {
+                let baris = "";
+                if (d.jenis === "Absen") {
+                    baris = `${d.tanggal},${d.jenis},${d.nama},${d.waktu},${d.status || ''}`;
+                } else if (d.jenis === "Gantikan") {
+                    baris = `${d.tanggal},${d.jenis},${d.pengganti},${d.waktu},Menggantikan ${d.digantikan}`;
+                }
+                csvContent += baris + "\n";
+            });
 
-// Lainnya (reset & tentang)
-function renderLainnyaSettings(){
-  const body = document.getElementById('pengaturan-body');
-  body.innerHTML = `
-    <h3>⚙️ Lainnya</h3>
-    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
-      <button class="card-action" id="btn-reset-absensi" style="background:#ffb3b3">⚠️ Hapus Semua Data Absensi</button>
-      <button class="card-action" id="btn-reset-semua" style="background:#ff8c8c">⚠️ Reset Semua (Absensi, Karyawan, Jadwal)</button>
-    </div>
-    <div style="margin-top:12px; padding:12px; background:var(--card); border-radius:8px">
-      <strong>Versi:</strong> 1.0.0<br>
-      <strong>Aplikasi:</strong> Absensi Angkringan Modern<br>
-      <small class="muted">Dibuat otomatis — gunakan fitur Backup sebelum reset.</small>
-    </div>
-  `;
-  document.getElementById('btn-reset-absensi').onclick = ()=>{
-    if(!confirm('Hapus semua data absensi? (aksi ini tidak menghapus daftar karyawan)')) return;
-    data = [];
-    localStorage.removeItem(STORAGE_ABSENSI);
-    tampilkan();
-    showToast('Semua data absensi dihapus');
-    tutupOverlay();
-  };
-  document.getElementById('btn-reset-semua').onclick = ()=>{
-    if(!confirm('Reset semua data (absensi, karyawan, jadwal)?')) return;
-    data = [];
-    karyawan = ["Lala","Zaki","Kemi","Haris","Izzul","Fawaz"];
-    jadwalMingguan = {"Senin":[],"Selasa":[],"Rabu":[],"Kamis":[],"Jumat":[],"Sabtu":[],"Minggu":[]};
-    localStorage.removeItem(STORAGE_ABSENSI);
-    localStorage.setItem(STORAGE_KARYAWAN, JSON.stringify(karyawan));
-    localStorage.setItem(STORAGE_JADWAL, JSON.stringify(jadwalMingguan));
-    showToast('Semua data direset');
-    tampilkan();
-    tutupOverlay();
-  };
-}
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_Absensi_${bulanTahun}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`⬇️ Data bulan ${bulanTahun} berhasil diekspor.`);
+        }
 
-// Safety: tutup overlay on Escape
-document.addEventListener('keydown', (ev)=>{
-  if(ev.key === 'Escape'){
-    if(document.getElementById('overlay').style.display === 'block') tutupOverlay();
-  }
-});
+        // ----------------------------
+        // RANKING & STATUS JADWAL
+        // ----------------------------
+        function tampilkanRanking() {
+            let ov = document.getElementById("overlay");
+            ov.innerHTML = `<div class="panel"><h3 style="margin-top:0;">🏆 Statistik Absensi Total</h3></div>`;
+            const panel = ov.querySelector('.panel');
 
-// storage event sync
-window.addEventListener('storage', (e)=>{
-  if(e.key === STORAGE_KARYAWAN){
-    try{ karyawan = JSON.parse(e.newValue || '[]'); }catch(){}
-  }
-});
+            const stats = {};
+            karyawan.forEach(nama => {
+                stats[nama] = { hadir: 0, terlambat: 0, digantikan: 0, menggantikan: 0, totalAbsensi: 0 };
+            });
 
-// On load
-updateStatusRingkas();
-tampilkan();
+            data.forEach(d => {
+                if (d.jenis === "Absen") {
+                    if (stats[d.nama]) {
+                        stats[d.nama].hadir++;
+                        stats[d.nama].totalAbsensi++;
+                    }
+                } else if (d.jenis === "Gantikan") {
+                    if (stats[d.pengganti]) {
+                        stats[d.pengganti].menggantikan++;
+                        stats[d.pengganti].totalAbsensi++;
+                    }
+                    if (stats[d.digantikan]) {
+                        stats[d.digantikan].digantikan++;
+                    }
+                }
+            });
 
-// expose some functions to window for inline onclicks
-window.mulaiAbsen = mulaiAbsen;
-window.mulaiAbsenTanggalLain = mulaiAbsenTanggalLain;
-window.mulaiGantikan = mulaiGantikan;
-window.tampilkanRanking = tampilkanRanking;
-window.tampilkanLaporanBulanan = tampilkanLaporanBulanan;
-window.tampilkanStatus = function(){ alert('Fungsi Status belum diisi'); };
-window.tampilkanPengaturan = tampilkanPengaturan;
-window.tampilkan = tampilkan;
-window.hapusRiwayat = hapusRiwayat;
+            const ranking = Object.keys(stats).map(nama => ({ nama, ...stats[nama] }))
+                .sort((a,b)=> {
+                    if (b.totalAbsensi !== a.totalAbsensi) return b.totalAbsensi - a.totalAbsensi;
+                    return a.terlambat - b.terlambat;
+                });
 
-</script>
+            let html = `<table style="width:100%; border-collapse: collapse; margin-top: 8px;">
+                <thead>
+                    <tr style="background-color: var(--accent-primary); color: white;">
+                        <th style="padding: 10px; border: 1px solid #ddd;">Nama</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Total</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Ganti (-/+)</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            ranking.forEach((r, index) => {
+                const warnaRow = (index === 0) ? "background-color: #ffe0b2;" : "background-color: var(--card);";
+                html += `
+                    <tr style="${warnaRow}">
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">${index + 1}. ${r.nama}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${r.totalAbsensi}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center; color: var(--accent-orange);">-${r.digantikan} / +${r.menggantikan}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            panel.innerHTML += html;
+
+            let batal=document.createElement("div");
+            batal.className="batal-btn-overlay";
+            batal.innerText="Tutup Ranking";
+            batal.onclick=tutupOverlay;
+            panel.appendChild(batal);
+
+            ov.style.display="block";
+        }
+
+        // STATUS JADWAL + FITUR GANTI JADWAL
+        function tampilkanStatus() {
+            let ov = document.getElementById("overlay");
+            const hariIni = getTodayDayName();
+            const jadwalHariIni = JadwalMingguan[hariIni] || [];
+            const hadirHariIni = data
+                .filter(d => d.tanggal === todayDate() && d.jenis === "Absen")
+                .map(d => d.nama);
+            
+            ov.innerHTML = `<div class="panel"><h3 style="margin-top:0;">📋 Status Jadwal Hari Ini (${hariIni})</h3></div>`;
+            const panel = ov.querySelector('.panel');
+
+            // Status Ringkas Hari Ini per karyawan (berdasarkan keseluruhan karyawan)
+            karyawan.forEach(nama => {
+                let statusClass = '';
+                let statusText = '';
+
+                const isDijadwalkan = (JadwalMingguan[getTodayDayName()] || []).includes(nama);
+                const isHadir = hadirHariIni.includes(nama);
+                const isMenggantikan = data.some(d => d.tanggal === todayDate() && d.pengganti === nama && d.jenis === "Gantikan");
+                const isDigantikan = data.some(d => d.tanggal === todayDate() && d.digantikan === nama && d.jenis === "Gantikan");
+
+                if (isHadir) {
+                    statusClass = 'status-hadir';
+                    const waktuAbsen = data.find(d => d.tanggal === todayDate() && d.nama === nama && d.jenis === "Absen").waktu;
+                    statusText = `Absen Hadir (${waktuAbsen})`;
+                } else if (isMenggantikan) {
+                    const digantikan = data.find(d => d.tanggal === todayDate() && d.pengganti === nama && d.jenis === "Gantikan").digantikan;
+                    statusClass = 'status-hadir'; 
+                    statusText = `Menggantikan ${digantikan}`;
+                } else if (isDigantikan) {
+                    const pengganti = data.find(d => d.tanggal === todayDate() && d.digantikan === nama && d.jenis === "Gantikan").pengganti;
+                    statusClass = 'status-seharusnya-hadir'; 
+                    statusText = `Digantikan oleh ${pengganti}`;
+                } else if (isDijadwalkan) {
+                    statusClass = 'status-belum-hadir';
+                    statusText = 'BELUM HADIR (Dijadwalkan)';
+                } else {
+                    statusClass = '';
+                    statusText = 'Tidak Dijadwalkan / Tidak Absen';
+                }
+
+                let item=document.createElement("div");
+                item.className=`list-item ${statusClass}`;
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.innerHTML = `<div style="display:flex; gap:10px; align-items:center;"><span style="font-weight:700">${nama}</span><small style="color:var(--muted)">${statusText}</small></div>
+                                  <div style="display:flex; gap:8px; align-items:center;">
+                                    <button onclick="gantiJadwal('${nama}')" style="padding:6px 8px; border-radius:8px; border:none; cursor:pointer; background:#f0f0f0; font-weight:700;">🔄 Ganti Jadwal</button>
+                                  </div>`;
+                panel.appendChild(item);
+            });
+
+            // Tampilkan jadwal mingguan lengkap + tombol edit ringkas per hari
+            let jadwalHtml = `<h4 style="margin-top:16px; color: var(--accent-primary);">Jadwal Reguler Minggu Ini:</h4>`;
+            Object.keys(JadwalMingguan).forEach(hari => {
+                jadwalHtml += `<div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="flex:1;"><strong>${hari}:</strong> ${JadwalMingguan[hari].join(', ') || '<i>Tidak ada</i>'}</div>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="editHari('${hari}')" style="padding:6px 8px; border-radius:8px; border:none; cursor:pointer; background:#fff0d9; font-weight:700;">✏️ Edit</button>
+                    </div>
+                </div>`;
+            });
+
+            panel.innerHTML += jadwalHtml;
+
+            let batal=document.createElement("div");
+            batal.className="batal-btn-overlay";
+            batal.innerText="Tutup Status";
+            batal.onclick=tutupOverlay;
+            panel.appendChild(batal);
+            
+            ov.style.display="block";
+        }
+
+        // Fungsi untuk membuka overlay mengganti jadwal untuk satu nama
+        function gantiJadwal(nama){
+            const ov = document.getElementById("overlay");
+            ov.innerHTML = `<div class="panel"><h3 style="margin-top:0;">🔄 Ganti Jadwal — ${nama}</h3></div>`;
+            const panel = ov.querySelector('.panel');
+
+            // Pilih hari saat ini (jika ada) dan hari tujuan
+            const hariSekarang = Object.keys(JadwalMingguan).find(h => (JadwalMingguan[h] || []).includes(nama)) || "Tidak Dijadwalkan";
+            const opsiHari = Object.keys(JadwalMingguan).map(h => `<option value="${h}">${h}</option>`).join('');
+
+            panel.innerHTML += `
+                <p style="margin:6px 0 12px 0; color:var(--muted)">Saat ini: <strong>${hariSekarang}</strong></p>
+                <label>Pindahkan ke hari lain:</label>
+                <select id="tujuan-hari">${opsiHari}</select>
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button id="btn-pindah" style="flex:1; padding:10px; border-radius:8px; border:none; cursor:pointer; background:var(--accent-primary); color:white; font-weight:700;">Pindahkan</button>
+                    <button id="btn-hapus" style="flex:1; padding:10px; border-radius:8px; border:none; cursor:pointer; background:var(--accent-red); color:white; font-weight:700;">Hapus dari Jadwal</button>
+                </div>
+                <div style="margin-top:10px;">
+                    <button class="batal-btn-overlay" id="btn-batal">Batal</button>
+                </div>
+            `;
+
+            document.getElementById('btn-batal').onclick = tutupOverlay;
+            document.getElementById('btn-pindah').onclick = ()=>{
+                const tujuan = document.getElementById('tujuan-hari').value;
+                if(!tujuan){ showToast('Pilih hari tujuan'); return; }
+                // Hapus dari hari lama
+                Object.keys(JadwalMingguan).forEach(h=>{
+                    JadwalMingguan[h] = (JadwalMingguan[h] || []).filter(x => x !== nama);
+                });
+                // Add to tujuan if not exists
+                if(!JadwalMingguan[tujuan]) JadwalMingguan[tujuan] = [];
+                if(!JadwalMingguan[tujuan].includes(nama)) JadwalMingguan[tujuan].push(nama);
+                saveJadwal(JadwalMingguan);
+                showToast(`${nama} dipindahkan ke ${tujuan}.`);
+                tutupOverlay();
+                // refresh status jika overlay sebelumnya ditutup
+                tampilkan();
+            };
+
+            document.getElementById('btn-hapus').onclick = ()=>{
+                if(!confirm(`Hapus ${nama} dari semua jadwal?`)) return;
+                Object.keys(JadwalMingguan).forEach(h=>{
+                    JadwalMingguan[h] = (JadwalMingguan[h] || []).filter(x => x !== nama);
+                });
+                saveJadwal(JadwalMingguan);
+                showToast(`${nama} dihapus dari jadwal.`);
+                tutupOverlay();
+                tampilkan();
+            };
+
+            ov.style.display = 'block';
+        }
+
+        // Edit per hari (tampilkan list & bisa tambah/hapus orang dari hari tersebut)
+        function editHari(hari){
+            const ov = document.getElementById("overlay");
+            ov.innerHTML = `<div class="panel"><h3 style="margin-top:0;">✏️ Edit Jadwal — ${hari}</h3></div>`;
+            const panel = ov.querySelector('.panel');
+
+            // Pilihan karyawan yang belum ada di hari ini
+            const ada = new Set(JadwalMingguan[hari] || []);
+            const opsiTambah = karyawan.filter(n => !ada.has(n)).map(n => `<option value="${n}">${n}</option>`).join('');
+
+            panel.innerHTML += `
+                <p style="margin:6px 0 10px 0;"><strong>Yang dijadwalkan:</strong> ${(JadwalMingguan[hari]||[]).join(', ') || '<i>Tidak ada</i>'}</p>
+                <label>Tambah Karyawan ke ${hari}:</label>
+                <select id="tambah-ke-hari"><option value="">-- Pilih --</option>${opsiTambah}</select>
+                <button id="btn-tambah" style="margin-top:8px; padding:10px; border-radius:8px; border:none; cursor:pointer; background:var(--accent-green); color:white; font-weight:700;">Tambah</button>
+
+                <h4 style="margin-top:14px;">Hapus dari hari ini:</h4>
+                <div id="list-hapus" style="margin-top:8px;"></div>
+
+                <div style="margin-top:12px;">
+                    <button class="batal-btn-overlay" id="btn-tutup-edit">Tutup</button>
+                </div>
+            `;
+
+            const listHapus = panel.querySelector('#list-hapus');
+            (JadwalMingguan[hari] || []).forEach(n=>{
+                let el = document.createElement('div');
+                el.style.display = 'flex';
+                el.style.justifyContent = 'space-between';
+                el.style.padding = '8px';
+                el.style.border = '1px solid #f0f0f0';
+                el.style.borderRadius = '8px';
+                el.style.marginBottom = '8px';
+                el.innerHTML = `<div style="font-weight:700">${n}</div><button style="background:#ff5959;color:white;border:none;padding:6px 8px;border-radius:8px;cursor:pointer;" onclick="hapusDariHari('${hari}','${n}')">Hapus</button>`;
+                listHapus.appendChild(el);
+            });
+
+            document.getElementById('btn-tambah').onclick = ()=>{
+                const pilih = document.getElementById('tambah-ke-hari').value;
+                if(!pilih) { showToast('Pilih karyawan untuk ditambahkan.'); return; }
+                if(!JadwalMingguan[hari]) JadwalMingguan[hari] = [];
+                if(!JadwalMingguan[hari].includes(pilih)) JadwalMingguan[hari].push(pilih);
+                saveJadwal(JadwalMingguan);
+                showToast(`${pilih} ditambahkan ke ${hari}.`);
+                tutupOverlay();
+                tampilkan();
+            };
+
+            document.getElementById('btn-tutup-edit').onclick = tutupOverlay;
+            ov.style.display = 'block';
+        }
+
+        function hapusDariHari(hari,nama){
+            if(!confirm(`Hapus ${nama} dari ${hari}?`)) return;
+            JadwalMingguan[hari] = (JadwalMingguan[hari] || []).filter(x=>x!==nama);
+            saveJadwal(JadwalMingguan);
+            showToast(`${nama} dihapus dari ${hari}.`);
+            tutupOverlay();
+            tampilkan();
+        }
+
+        // ----------------------------
+        // STATUS RINGKAS
+        // ----------------------------
+        function updateStatusRingkas() {
+            const statusDiv = document.getElementById('status-ringkas');
+            const hariIni = getTodayDayName();
+            const tanggalAbsen = todayDate();
+            const jadwalHariIni = JadwalMingguan[hariIni] || [];
+            
+            const absensiHariIni = data.filter(d => d.tanggal === tanggalAbsen && d.jenis === "Absen");
+            const hadir = absensiHariIni.length;
+            const belumAbsenDijadwalkan = jadwalHariIni.filter(nama => !absensiHariIni.some(d => d.nama === nama)).length;
+
+            let statusText = `${hariIni} (${tanggalAbsen}) | Hadir: ${hadir} ${belumAbsenDijadwalkan > 0 ? `| Belum Absen: ${belumAbsenDijadwalkan}` : ''}`;
+
+            if (hadir === jadwalHariIni.length && belumAbsenDijadwalkan === 0 && jadwalHariIni.length > 0) {
+                statusText = `✅ ${hariIni}: Semua ${hadir} Karyawan Dijadwalkan Sudah Absen!`;
+            } else if (jadwalHariIni.length === 0) {
+                statusText = `${hariIni}: Tidak Ada Jadwal Reguler. ${hadir} Absen Manual.`;
+            }
+
+            statusDiv.innerHTML = statusText;
+        }
+
+        // INISIALISASI
+        document.addEventListener('DOMContentLoaded', () => {
+            tampilkan();
+        });
+    </script>
 </body>
 </html>
